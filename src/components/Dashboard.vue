@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-row align="center" class="list px-3 mx-auto">
-      <div class="myTable">
+    <div class="flex">
+      <div>
         <br />
         Класс
         <select
@@ -17,8 +17,6 @@
             {{ user.className }}
           </option>
         </select>
-      </div>
-      <div class="myTable">
         <label for="className">Выбрать день</label>
         <input
           type="date"
@@ -29,43 +27,45 @@
           v-model="sDates.date"
           @change="load"
         />
-      </div>
-      <div>
-        <div class="flex">
+        <div>
           <button @click="load" class="btn btn-success">Загрузить</button>
-          <v-card-actions v-if="marks.length == 0">
-            <button
-              id="sendData"
-              class="btn btn-primary"
-              @click="send()"
-              color="primary"
-            >
-              ОТПРАВИТЬ ДАННЫЕ
-            </button>
-          </v-card-actions>
-          <v-card-actions v-else>
-            <button
-              id="sendData"
-              class="btn btn-primary"
-              @click="send()"
-              color="primary"
-              disabled="true"
-            >
-              ОТПРАВИТЬ ДАННЫЕ
-            </button>
-          </v-card-actions>
         </div>
       </div>
-    </v-row>
-    <div class="flex">
-      <ul v-for="caus in causes" :key="caus.causes" class="flex2">
-        <li>
-          {{ caus.causes }}
-          = {{ caus.count }}
-        </li>
-      </ul>
-    </div>
+      <div>
+        <div class="flex-ul">
+          <ul v-for="caus in causes" :key="caus.causes">
+            <li>
+              {{ caus.causes }}
+              = {{ caus.count }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div v-if="marks.length == 0">
+          <button
+            id="sendData"
+            class="btn btn-primary"
+            @click="send()"
+            color="primary"
+          >
+            ОТПРАВИТЬ ДАННЫЕ
+          </button>
+        </div>
 
+        <div v-else>
+          <button
+            id="sendData"
+            class="btn btn-primary"
+            @click="send()"
+            color="primary"
+            disabled="true"
+          >
+            ОТПРАВИТЬ ДАННЫЕ
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="myTable">
       <v-col>
         <v-card>
@@ -116,41 +116,77 @@
 
 <style>
 .flex {
-  padding-top: 2%;
-  text-align: center;
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-direction: row;
   flex-direction: row;
+  align-items: center;
+  align-content: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 1%;
+  margin: 0 0px 0px 0px;
+}
+.flex:only-child {
+  margin: 200px 200px 200px 200px;
+}
+.flex-bottom {
+  padding-top: 2px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+.flex-input {
+  padding-top: 2px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.flex li {
+  text-align: center;
+  display: flex;
+  padding-bottom: 0px;
+}
+.flex button {
+  text-align: center;
+  display: flex;
+  margin-bottom: 20px;
+  margin-left: 20px;
 }
 
 .myTable {
-  max-width: 60%;
+  display: flex;
+  max-width: 800px;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
 }
 
 tbody tr:nth-of-type(even) {
-  background-color: rgba(236, 237, 237);
+  background-color: rgb(245, 245, 245);
 }
 
 tbody tr:nth-of-type(odd) {
-  background-color: rgb(250, 250, 250);
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 }
 
 .v-data-table-header {
-  background-color: rgba(182, 183, 187);
-  color: white;
+  background-color: rgb(80, 81, 141);
+}
+.v-data-table-header span {
+  color: rgb(255, 255, 255);
+  font-size: 16px;
 }
 
 .v-data-footer {
-  background-color: rgb(250, 250, 250);
+  background-color: rgb(255, 255, 255);
 }
-
-.theme--light.v-data-table thead tr th {
-  color: white;
+.text-start {
+  border: 1px solid grey;
+}
+navbar {
+  border: 1px solid grey;
+  background-color: rgb(204, 204, 204);
 }
 
 .flex2 {
@@ -159,13 +195,6 @@ tbody tr:nth-of-type(odd) {
   flex-direction: row;
   justify-content: center;
   height: 150%;
-}
-
-ul.flex2 li {
-  display: inline;
-  margin-right: 20px; /* Отступ слева */
-  border: 1px solid #000; /* Рамка вокруг текста */
-  padding: 3px; /* Поля вокруг текста */
 }
 </style>
 
@@ -176,16 +205,8 @@ export default {
   data() {
     return {
       countMark: [],
-      sClass: [{ className: "123", classID: "sadasd" }, { className: "122" }],
-      sClassInput: [
-        {
-          className: "123",
-          classID: "sadasd",
-          classLider: "asdasd",
-          date: "123",
-        },
-        { classID: "123123" },
-      ],
+      sClass: [{ className: "123", classID: "sadasd" }],
+      sClassInput: [],
       selectedClassID: [],
       selectedMarks: [],
       sDates: [],
@@ -248,7 +269,7 @@ export default {
         "MAAAAAAAAssssssssAAAAAAAAAAAAAAAAARK",
         this.marks,
         this.marks.length,
-        this.sClassInput
+        this.sClassInput,
       );
       await TutorialDataService.getAllCauses().then((response) => {
         this.causes = response.data.map(this.getDisplayCauses);
@@ -387,15 +408,19 @@ export default {
     },
 
     retrieveClass() {
+      //поставить текущую дату
       console.log(this.sDates);
       document.getElementById("Date").value = new Date();
       console.log(this.sDates);
       this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
+      // добавить колонку с датой и выбором
       this.$set(this.headers, 4, {
         text: this.sDates.date,
         value: "date",
         width: "20%",
       });
+
+      //получить список классов
       TutorialDataService.getAllCLass()
         .then((response) => {
           this.sClass = response.data.map(this.getDisplayClass);

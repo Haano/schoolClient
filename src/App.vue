@@ -1,6 +1,9 @@
 <template>
   <v-app>
-    <v-app-bar app dark>
+    <navbar
+      class="navbar navbar-expand-lg navbar-light"
+      style="background-color: #e3f2fd border: 1px solid grey;"
+    >
       <div class="d-flex align-center mr-2">Отсутствующие</div>
 
       <v-btn to="/Dashboard" text> ГЛАВНАЯ </v-btn>
@@ -12,8 +15,7 @@
 
       <!-- <v-btn to="/tutorials" text> Tutorials </v-btn>
       <v-btn to="/add" text> Add </v-btn> -->
-    </v-app-bar>
-
+    </navbar>
     <v-main>
       <router-view />
     </v-main>
