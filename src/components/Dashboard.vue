@@ -22,13 +22,15 @@
           type="date"
           id="Date"
           class="form-control"
-          value="2018-07-22"
           required
           v-model="sDates.date"
-          @change="load"
+          @change="load(sDates.date)"
         />
-        <div>
-          <button @click="load" class="btn btn-success">Загрузить</button>
+        <div v-if="selectedClassID">
+          <br />
+          <button @click="loadLastDay" id="loadLast" class="btn btn-success">
+            Загрузить значения прошлого дня
+          </button>
         </div>
       </div>
       <div>
@@ -225,6 +227,43 @@ export default {
   },
 
   methods: {
+    async pow(x, data, test, data2) {
+      if (x === 0) {
+        return;
+      }
+      if (Object.keys(await test).length > 0) {
+        await this.load(data);
+        document.getElementById("sendData").disabled = false;
+        return;
+      } else {
+        console.log("прошел", data2, date);
+        data2 = data2 - 86400000;
+        var date = new Date(data2);
+        console.log("прошел", data2, date);
+        data = date.toISOString().slice(0, 10);
+        test = await this.findMarksThis(date.toISOString().slice(0, 10));
+
+        this.pow(x - 1, data, test, data2);
+      }
+      //load(data);
+      return;
+    },
+
+    async loadLastDay() {
+      await console.log(this.marks);
+      console.log("Илюша");
+      var data = document.getElementById("Date").valueAsNumber;
+      console.log("было", document.getElementById("Date").valueAsNumber);
+      data = data - 86400000;
+      var data2 = data;
+      var date = new Date(data);
+      console.log("стало", date.toISOString().slice(0, 10));
+      data = date.toISOString().slice(0, 10);
+      var test = this.findMarksThis(date.toISOString().slice(0, 10));
+      console.log("TEEEEEEEEEEST", Object.keys(await test).length);
+      await this.pow(3, data, test, data2);
+    },
+
     countMarks(data, id, mark) {
       var a = document.getElementById(id);
 
@@ -256,21 +295,16 @@ export default {
       console.log("стало", a.name);
     },
 
-    async load() {
+    async load(data) {
       // document.getElementById("sendData").disabled = true;
-      this.headers[4].text = this.sDates.date;
+      this.headers[4].text = data;
       this.marks = Array();
       this.marks.splice(0);
       for (var i = 0; i < this.sClassInput.length; i++) {
         this.$set(this.sClassInput[i], "date", "");
       }
-      await this.findMarksThis();
-      console.log(
-        "MAAAAAAAAssssssssAAAAAAAAAAAAAAAAARK",
-        this.marks,
-        this.marks.length,
-        this.sClassInput,
-      );
+      await this.findMarksThis(data);
+
       await TutorialDataService.getAllCauses().then((response) => {
         this.causes = response.data.map(this.getDisplayCauses);
       });
@@ -289,6 +323,12 @@ export default {
         }
       }
       await this.selectedSelect();
+      console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks.length);
+      if (this.marks.length > 0) {
+        document.getElementById("loadLast").disabled = true;
+      } else {
+        document.getElementById("loadLast").disabled = false;
+      }
     },
 
     async selectedSelect() {
@@ -320,13 +360,19 @@ export default {
       console.log(this.sDates);
     },
 
-    async findMarksThis() {
+    async findMarksThis(data) {
       var temp1;
-      temp1 = { classID: this.selectedClassID.classID, date: this.sDates.date };
+      temp1 = { classID: this.selectedClassID.classID, date: data }; //this.sDates.date };
       await TutorialDataService.findMarks(temp1)
         .then((response) => {
           var a = new Array();
           a = Object.values(response.data);
+          temp1 = response.data;
+          if (a.length > 0) {
+            console.log("@@@нашелЯ", response.data);
+          } else {
+            console.log("@@@@НЕнашелЯ", response.data);
+          }
           for (var i = 0; i < a.length; i++) {
             this.$set(this.marks, i, a[i]);
           }
@@ -334,6 +380,7 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+      return temp1;
     },
 
     test2(data) {
@@ -403,7 +450,7 @@ export default {
         });
 
       if (this.sDates.date) {
-        this.load();
+        this.load(this.sDates.date);
       }
     },
 
