@@ -236,10 +236,8 @@ export default {
         document.getElementById("sendData").disabled = false;
         return;
       } else {
-        console.log("прошел", data2, date);
         data2 = data2 - 86400000;
         var date = new Date(data2);
-        console.log("прошел", data2, date);
         data = date.toISOString().slice(0, 10);
         test = await this.findMarksThis(date.toISOString().slice(0, 10));
 
@@ -251,16 +249,12 @@ export default {
 
     async loadLastDay() {
       await console.log(this.marks);
-      console.log("Илюша");
       var data = document.getElementById("Date").valueAsNumber;
-      console.log("было", document.getElementById("Date").valueAsNumber);
       data = data - 86400000;
       var data2 = data;
       var date = new Date(data);
-      console.log("стало", date.toISOString().slice(0, 10));
       data = date.toISOString().slice(0, 10);
       var test = this.findMarksThis(date.toISOString().slice(0, 10));
-      console.log("TEEEEEEEEEEST", Object.keys(await test).length);
       await this.pow(3, data, test, data2);
     },
 
@@ -268,7 +262,6 @@ export default {
       var a = document.getElementById(id);
 
       var b = a.options[a.selectedIndex || 0].value;
-      console.log("a", a, "mark", mark, "id", id, data, "b,=", b);
       mark.mark = b;
       // this.$set(this.mark, "mark", b);
 
@@ -292,7 +285,6 @@ export default {
         }
       }
       a.name = mark.mark;
-      console.log("стало", a.name);
     },
 
     async load(data) {
@@ -323,7 +315,7 @@ export default {
         }
       }
       await this.selectedSelect();
-      console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks.length);
+      // console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks.length);
       if (this.marks.length > 0) {
         document.getElementById("loadLast").disabled = true;
       } else {
@@ -356,8 +348,8 @@ export default {
           // }
         }
       }
-      console.log("END");
-      console.log(this.sDates);
+      // console.log("END");
+      // console.log(this.sDates);
     },
 
     async findMarksThis(data) {
@@ -368,11 +360,11 @@ export default {
           var a = new Array();
           a = Object.values(response.data);
           temp1 = response.data;
-          if (a.length > 0) {
-            console.log("@@@нашелЯ", response.data);
-          } else {
-            console.log("@@@@НЕнашелЯ", response.data);
-          }
+          // if (a.length > 0) {
+          //   console.log("@@@нашелЯ", response.data);
+          // } else {
+          //   console.log("@@@@НЕнашелЯ", response.data);
+          // }
           for (var i = 0; i < a.length; i++) {
             this.$set(this.marks, i, a[i]);
           }
@@ -400,23 +392,28 @@ export default {
         });
     },
 
-    send(id) {
+    send() {
       let temp;
       var data = this.sClassInput;
-      console.log("вывел", data.length);
       var datas = new Array();
-      var j = 0;
       for (var i = 0; i < data.length; i++) {
-        if (data[i].mark) {
-          temp = data[i].mark;
+        if (data[i].mark === undefined || data[i].mark === "") {
+          temp = "";
 
-          datas[j] = {
+          datas[i] = {
             date: this.sDates.date,
             classID: data[i].classID,
             studentID: data[i]._id,
             causesID: temp,
           };
-          j++;
+        } else {
+          temp = data[i].mark;
+          datas[i] = {
+            date: this.sDates.date,
+            classID: data[i].classID,
+            studentID: data[i]._id,
+            causesID: temp,
+          };
         }
       }
       console.log("вывел2", datas);
@@ -428,7 +425,7 @@ export default {
           console.log("1111111111", e);
         });
 
-      console.log(id, document.getElementById("sendData"));
+      console.log(document.getElementById("sendData"));
       document.getElementById("sendData").disabled = true;
     },
 
