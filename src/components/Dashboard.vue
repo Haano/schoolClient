@@ -288,6 +288,10 @@ export default {
       //this.$set(this.causesDefault[0], "count", this.sClassInput.length);
       var b = a.options[a.selectedIndex || 0].value;
       mark.mark = b;
+      if (mark.mark === "") {
+        console.log(mark.mark, "MARK");
+      }
+
       // this.$set(this.mark, "mark", b);
 
       this.$set(this.causesDefault[1], "count", 0);
@@ -302,21 +306,24 @@ export default {
       }
       a.name = mark.mark;
 
+      // let presentCount = Document.getElementsByClassName(".form-select");
+      // console.log("!!!!!!!!! presentCount", presentCount);
+
       for (var i = 0; i < this.sClassInput.length; i++) {
-        if (mark.mark === "Питался" || mark.mark === "") {
-          if (this.sClassInput[i]._id === id) {
-            this.sClassInput[i].count = true;
-          } else {
-            this.sClassInput[i].count = false;
-          }
-        }
-        if (this.sClassInput[i].count) {
+        console.log(this.sClassInput[i].date);
+        if (
+          this.sClassInput[i].mark === "Питался" ||
+          this.sClassInput[i].mark === ""
+        ) {
           this.$set(
             this.causesDefault[1],
             "count",
             this.causesDefault[1].count + 1,
           );
         }
+        // if (this.sClassInput[i].count) {
+        //
+        // }
       }
     },
 
@@ -346,6 +353,7 @@ export default {
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
             this.$set(this.sClassInput[i], "date", this.marks[j].causesID);
+            this.$set(this.sClassInput[i], "mark", this.marks[j].causesID);
 
             for (var c = 0; c < this.causes.length; c++) {
               if (this.causes[c].causes === this.marks[j].causesID) {
@@ -357,6 +365,7 @@ export default {
         if (this.marks.length === 0) {
           console.log("))))))))))00");
           this.$set(this.sClassInput[i], "date", "");
+          this.$set(this.sClassInput[i], "mark", "");
         }
         if (
           this.sClassInput[i].date === "" ||
@@ -383,6 +392,8 @@ export default {
         document.getElementById("loadLast").disabled = false;
         document.getElementById("sendData").disabled = false;
       }
+
+      console.log(this.sClassInput, "CLASSSSSSS");
     },
 
     async selectedSelect() {
@@ -393,7 +404,17 @@ export default {
           a = document.getElementById(this.sClassInput[i]._id);
           if (a.options[j].text === this.sClassInput[i].date) {
             a.options[j].selected = true;
-            a.name = a.options[j].text;
+
+            if (a.options[j].text === "") {
+              a.name = "";
+              console.log(
+                "OPTIONS",
+                a.options[j].text,
+                this.sClassInput[i]._id,
+              );
+            } else {
+              a.name = a.options[j].text;
+            }
           }
 
           // else {
@@ -467,6 +488,7 @@ export default {
             classID: data[i].classID,
             studentID: data[i]._id,
             causesID: temp,
+            cat: data[i].Category,
           };
         } else {
           temp = data[i].mark;
@@ -475,6 +497,7 @@ export default {
             classID: data[i].classID,
             studentID: data[i]._id,
             causesID: temp,
+            cat: data[i].Category,
           };
         }
       }
