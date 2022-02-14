@@ -37,16 +37,16 @@
       <div class="submit-form">
         <div class="form-group">
           <label for="className">Фамилия</label>
-          <input type="text" class="form-control" required v-model="LastName" />
-        </div>
-        <div class="form-group">
-          <label for="classLider">Имя</label>
           <input
             type="text"
             class="form-control"
             required
             v-model="FirstName"
           />
+        </div>
+        <div class="form-group">
+          <label for="classLider">Имя</label>
+          <input type="text" class="form-control" required v-model="LastName" />
         </div>
         <div class="form-group">
           <label for="classLider">Отчество</label>

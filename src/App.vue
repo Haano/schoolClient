@@ -6,7 +6,7 @@
     >
       <div class="d-flex align-center mr-2">Отсутствующие</div>
 
-      <v-btn to="/Dashboard" text> ГЛАВНАЯ </v-btn>
+      <v-btn to="/" text> ГЛАВНАЯ </v-btn>
       <v-btn to="/class" text> Классы </v-btn>
       <v-btn to="/CreateStudent" text> Ученики </v-btn>
       <v-btn to="/Categories" text> Категории </v-btn>
