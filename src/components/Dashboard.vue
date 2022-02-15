@@ -102,7 +102,11 @@
 
               <!-- <span>{{ item.date }}{{ item }}</span> -->
               <v-card-actions id="update" v-show="marks.length > 0">
-                <button @click="test2(item)" class="btn btn-success">
+                <button
+                  v-bind:id="item._id + 'update'"
+                  @click="updateThisMark(item)"
+                  class="btn btn-success"
+                >
                   Обновить
                 </button>
               </v-card-actions>
@@ -115,96 +119,7 @@
 </template>
 
 <style>
-.select {
-  width: 100%;
-}
-.select-flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: left;
-}
-.flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0 1%;
-  margin: 0 0px 0px 0px;
-}
-.flex:only-child {
-  margin: 200px 200px 200px 200px;
-}
-.flex-bottom {
-  padding-top: 2px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-.flex-input {
-  padding-top: 2px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.flex li {
-  text-align: center;
-  display: flex;
-  padding-bottom: 0px;
-}
-.flex button {
-  text-align: center;
-  display: flex;
-  margin-bottom: 20px;
-  margin-left: 20px;
-}
-
-.myTable {
-  display: flex;
-  max-width: 900px;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-tbody tr:nth-of-type(even) {
-  background-color: rgb(245, 245, 245);
-}
-
-tbody tr:nth-of-type(odd) {
-  background-color: rgb(255, 255, 255);
-  color: rgb(0, 0, 0);
-}
-
-.v-data-table-header {
-  background-color: rgb(105, 106, 172);
-}
-.v-data-table-header span {
-  color: rgb(255, 255, 255);
-  font-size: 16px;
-}
-
-.v-data-footer {
-  background-color: rgb(255, 255, 255);
-}
-.text-start {
-  border: 1px solid grey;
-}
-navbar {
-  border: 1px solid grey;
-  background-color: rgb(204, 204, 204);
-}
-
-.flex2 {
-  padding-top: 2%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  height: 150%;
-}
+@import "../assets/style.css";
 </style>
 
 <script>
@@ -318,7 +233,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         }
         // if (this.sClassInput[i].count) {
@@ -350,6 +265,9 @@ export default {
       this.$set(this.causesDefault[1], "count", 0);
 
       for (i = 0; i < this.sClassInput.length; i++) {
+        document.getElementById(
+          this.sClassInput[i]._id + "update"
+        ).disabled = false;
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
             this.$set(this.sClassInput[i], "date", this.marks[j].causesID);
@@ -363,7 +281,6 @@ export default {
           }
         }
         if (this.marks.length === 0) {
-          console.log("))))))))))00");
           this.$set(this.sClassInput[i], "date", "");
           this.$set(this.sClassInput[i], "mark", "");
         }
@@ -374,7 +291,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         } else {
           this.sClassInput[i].count = false;
@@ -384,10 +301,21 @@ export default {
       this.$set(this.causesDefault[0], "count", this.sClassInput.length);
 
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
-      // console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks.length);
+      console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks);
       if (this.marks.length > 0) {
         document.getElementById("loadLast").disabled = true;
         document.getElementById("sendData").disabled = true;
+        for (i = 0; i < this.marks.length; i++) {
+          if (this.marks[i].change) {
+            document.getElementById(
+              this.marks[i].studentID + "update"
+            ).disabled = false;
+          } else {
+            document.getElementById(
+              this.marks[i].studentID + "update"
+            ).disabled = true;
+          }
+        }
       } else {
         document.getElementById("loadLast").disabled = false;
         document.getElementById("sendData").disabled = false;
@@ -410,7 +338,7 @@ export default {
               console.log(
                 "OPTIONS",
                 a.options[j].text,
-                this.sClassInput[i]._id,
+                this.sClassInput[i]._id
               );
             } else {
               a.name = a.options[j].text;
@@ -449,30 +377,47 @@ export default {
           //   console.log("@@@@НЕнашелЯ", response.data);
           // }
           for (var i = 0; i < a.length; i++) {
+            if (a[i].createdAt === a[i].updatedAt) {
+              console.log("Я ПОЛУЧИЛ МАРКУ", a[i].createdAt, a[i].updatedAt);
+              a[i].change = true;
+            } else {
+              console.log("@@@@@@@@@", a[i].createdAt, a[i].updatedAt);
+              a[i].change = false;
+            }
             this.$set(this.marks, i, a[i]);
+            //this.$set(this.marks, i, { change: true });
           }
         })
         .catch((e) => {
           console.log(e);
         });
+      console.log("Я ПОЛУЧИЛ ВСЕ", this.marks);
       return temp1;
     },
 
-    test2(data) {
+    updateThisMark(data) {
+      var markID;
+
+      for (var j = 0; j < this.marks.length; j++) {
+        if (this.marks[j].studentID === data._id) {
+          markID = this.marks[j]._id;
+          console.log("Я НАШЕЛ СТУДЕНТА", datas);
+        }
+      }
       var datas = {
-        date: this.sDates.date,
-        classID: data.classID,
-        studentID: data._id,
-        causesID: data.mark,
+        causes: data.mark,
       };
-      console.log("вывел2", datas);
-      TutorialDataService.createMarks(datas)
+
+      TutorialDataService.updateMark(markID, datas)
         .then((response) => {
           console.log("УСПЕШНО ОТПРАВЛЕНО", response);
         })
         .catch((e) => {
           console.log("1111111111", e);
         });
+      console.log("вывел2", data._id);
+
+      document.getElementById(data._id + "update").disabled = true;
     },
 
     send() {
@@ -501,7 +446,6 @@ export default {
           };
         }
       }
-      console.log("вывел2", datas);
       TutorialDataService.createMarks(datas)
         .then((response) => {
           console.log("УСПЕШНО ОТПРАВЛЕНО", response);
@@ -513,7 +457,6 @@ export default {
       console.log(document.getElementById("sendData"));
       document.getElementById("sendData").disabled = true;
       let bottomHidden = document.querySelectorAll("#update");
-
       console.log(bottomHidden);
       for (i = 0; i < bottomHidden.length; i++) {
         bottomHidden[i].hidden = false;
@@ -524,8 +467,6 @@ export default {
     },
 
     show(data) {
-      console.log("mAAAAAAARKS изначально", this.marks);
-
       TutorialDataService.findStudentByClassID(data)
         .then((response) => {
           this.sClassInput.splice(response.data);
