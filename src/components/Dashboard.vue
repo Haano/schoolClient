@@ -305,6 +305,7 @@ export default {
       if (this.marks.length > 0) {
         document.getElementById("loadLast").disabled = true;
         document.getElementById("sendData").disabled = true;
+
         for (i = 0; i < this.marks.length; i++) {
           if (this.marks[i].change) {
             document.getElementById(
@@ -464,6 +465,8 @@ export default {
         bottomHidden[i].style = "display: flex";
       }
       document.getElementById("loadLast").disabled = true;
+
+      // this.show(this.selectedClassID);
     },
 
     show(data) {
