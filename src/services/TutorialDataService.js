@@ -20,6 +20,12 @@ class TutorialDataService {
   delete(id) {
     return http.delete(`/tutorials/${id}`);
   }
+  deleteCauses(id) {
+    return http.delete(`/causes/${id}`);
+  }
+  deleteCategory(id) {
+    return http.delete(`/category/${id}`);
+  }
 
   deleteAll() {
     return http.delete(`/tutorials`);

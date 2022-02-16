@@ -300,14 +300,18 @@ export default {
       await this.selectedSelect();
       this.$set(this.causesDefault[0], "count", this.sClassInput.length);
 
+      let toDay = new Date().toISOString().slice(0, 10);
+      console.log("TOOOODAAAAY", toDay);
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
-      console.log("ЬФФФФФФФФФФФФФКФЫВА", this.marks);
       if (this.marks.length > 0) {
         document.getElementById("loadLast").disabled = true;
         document.getElementById("sendData").disabled = true;
 
         for (i = 0; i < this.marks.length; i++) {
-          if (this.marks[i].change) {
+          if (
+            this.marks[i].change &&
+            toDay === this.marks[i].date.slice(0, 10)
+          ) {
             document.getElementById(
               this.marks[i].studentID + "update"
             ).disabled = false;

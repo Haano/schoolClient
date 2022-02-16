@@ -88,3 +88,24 @@ navbar {
   justify-content: center;
   height: 150%;
 }
+.cat {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cat div {
+  /* width: 400px; */
+  margin: 0px 0px 0px 0px;
+}
+.cat-item {
+  display: flex;
+  flex-direction: column;
+  /* flex-basis: 200px; */
+  width: auto;
+  margin: 0px 20px 0px 0px;
+  padding: 10px 10px;
+}
+.cat-item button {
+  margin: 10px 0px;
+}
