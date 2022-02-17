@@ -24,6 +24,19 @@
             name="classLider"
           />
         </div>
+        <br />
+      </div>
+      <div>
+        Категория
+        <select class="form-select" v-model="sclass.shiftSchool">
+          <option
+            v-for="cat in sShift"
+            :key="cat.shiftSchool"
+            v-bind:value="cat.shiftSchool"
+          >
+            {{ cat.shiftSchool }}
+          </option>
+        </select>
       </div>
       <br />
       <button @click="create" class="btn btn-success">Создать класс</button>
@@ -44,6 +57,9 @@
     </div>
   </v-row>
 </template>
+<style>
+@import "../assets/style.css";
+</style>
 <script>
 import TutorialDataService from "../services/TutorialDataService";
 //import { default as AddClass } from "./AddClass.vue";
@@ -53,11 +69,13 @@ export default {
   name: "tutorials-list",
   data() {
     return {
+      sShift: [{ shiftSchool: "1 смена" }, { shiftSchool: "2 смена" }],
       sclass: [],
       title: "",
       headers: [
         { text: "Класс", align: "start", sortable: true, value: "className" },
         { text: "Классный руководитель", value: "classLider", sortable: false },
+        { text: "Смена", value: "shiftSchool", sortable: false },
         { text: "Actions", value: "actions", sortable: false },
       ],
     };
@@ -70,7 +88,10 @@ export default {
       var data = {
         className: this.sclass.className,
         classLider: this.sclass.classLider,
+        shiftSchool: this.sclass.shiftSchool,
       };
+
+      console.log("dATAAAA", this.sclass);
       // TutorialDataService.test(data);
       TutorialDataService.createClass(data)
         .then((response) => {
@@ -115,6 +136,7 @@ export default {
         id: data._id,
         className: data.className,
         classLider: data.classLider,
+        shiftSchool: data.shift,
       };
     },
   },
