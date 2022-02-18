@@ -1,23 +1,26 @@
 <template>
   <div>
-    <div class="flex">
-      <div>
-        <label for="className">Выбрать день</label>
+    <div class="cat">
+      <div class="cat-item">
         <input
           type="date"
           id="Date"
           class="form-control"
           required
           v-model="sDates.date"
+          @change="findMarksThis()"
         />
+        <button @click="findMarksThis()" class="btn btn-success">
+          Обновить
+        </button>
       </div>
     </div>
     <div class="shift-name">
       <div class="class-mark">
-        <div class="class-mark-item-ok">1 смена</div>
+        <div class="class-mark-item-text">1 смена</div>
       </div>
       <div class="class-mark">
-        <div class="class-mark-item-ok">2 смена</div>
+        <div class="class-mark-item-text">2 смена</div>
       </div>
     </div>
 
@@ -26,14 +29,32 @@
       <div class="class-mark">
         <div v-for="value in classList" :key="value.classname">
           <div
-            v-if="value.marks.length != 0 && value.shift === '1 смена'"
+            v-if="
+              value.marks.length != 0 &&
+              value.shift === '1 смена' &&
+              value.change === false
+            "
             v-bind:class="activeClassOK"
           >
             {{ value.className }}
           </div>
           <div
-            v-if="value.marks.length === 0 && value.shift === '1 смена'"
+            v-if="
+              value.marks.length === 0 &&
+              value.shift === '1 смена' &&
+              value.change === false
+            "
             v-bind:class="activeClassBAD"
+          >
+            {{ value.className }}
+          </div>
+          <div
+            v-if="
+              value.marks.length != 0 &&
+              value.shift === '1 смена' &&
+              value.change === true
+            "
+            v-bind:class="activeClassChange"
           >
             {{ value.className }}
           </div>
@@ -42,7 +63,11 @@
       <div class="class-mark">
         <div v-for="value in classList" :key="value.classname">
           <div
-            v-if="value.marks.length != 0 && value.shift === '2 смена'"
+            v-if="
+              value.marks.length != 0 &&
+              value.shift === '2 смена' &&
+              value.change === false
+            "
             v-bind:class="activeClassOK"
           >
             {{ value.className }}
@@ -53,11 +78,30 @@
           >
             {{ value.className }}
           </div>
+          <div
+            v-if="
+              value.marks.length != 0 &&
+              value.shift === '2 смена' &&
+              value.change === true
+            "
+            v-bind:class="activeClassChange"
+          >
+            {{ value.className }}
+          </div>
         </div>
       </div>
     </div>
 
-    <button @click="findMarksThis()" class="btn btn-success">Обновить</button>
+    <v-col>
+      <v-data-table
+        :headers="headers"
+        :items="this.marks"
+        :items-per-page="150"
+      >
+      </v-data-table>
+    </v-col>
+
+    <button @click="help()" class="btn btn-success">Помощь</button>
   </div>
 </template>
 
@@ -66,14 +110,32 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      headers: [
+        {
+          text: "Marks",
+          value: "classID",
+          sortable: false,
+        },
+        {
+          text: "Категория",
+          value: "cat",
+          sortable: false,
+        },
+      ],
       marks: [],
       sDates: [],
       classList: [],
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
+      activeClassChange: "class-mark-item-change",
     };
   },
   methods: {
+    help() {
+      alert(
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения"
+      );
+    },
     async findMarksThis() {
       this.classList.splice(0);
       TutorialDataService.getAllCLass()
@@ -89,16 +151,29 @@ export default {
         .then((response) => {
           var a = new Array();
           a = Object.values(response.data);
-          temp1 = response.data;
-          console.log("Я ПОЛУЧИЛ ВСЕ", a);
+          this.marks = a;
+          for (var t = 0; t <= this.marks.length; t++) {
+            for (var r = 0; r < this.classList; r++) {
+              console.log(this.classList[r]);
+              if (this.marks[t].classID === this.classList[r].classID) {
+                console.log(this.classList[r].classID);
+                this.$set(
+                  this.marks[t],
+                  "classID",
+                  this.classList[r].className
+                );
+              }
+            }
+          }
           for (var j = 0; j <= this.classList.length; j++) {
             for (var i = 0; i < a.length; i++) {
-              console.log("Я  ВСЕ", a[i].classID);
-              console.log(this.classList[j].classID, "DDD");
               if (this.classList[j].classID === a[i].classID) {
-                console.log(this.classList[j].classID, "DDD");
                 this.classList[j].marks.push(a[i]);
                 //  this.$push(this.classList[j].marks, a[i]);
+                if (a[i].createdAt != a[i].updatedAt) {
+                  // this.classList[j].change.push(true);
+                  this.$set(this.classList[j], "change", true);
+                }
               }
             }
           }
@@ -126,6 +201,7 @@ export default {
         className: data.className,
         marks: [],
         shift: data.shift,
+        change: false,
       };
     },
   },
@@ -160,16 +236,31 @@ export default {
   flex-wrap: wrap;
   padding: 0px 5% 0px 10%;
 }
+.class-mark-item-text {
+  background-color: green;
+  margin: 1px;
+  color: white;
+  padding: 5px 40px 5px 3px;
+}
 .class-mark-item-ok {
   background-color: green;
   margin: 1px;
   color: white;
-  padding: 10px 10px 10px 10px;
+  padding: 5px 30px 5px 3px;
+  max-width: 10px;
 }
 .class-mark-item-BAD {
   background-color: rgb(128, 0, 0);
   color: white;
   margin: 1px;
-  padding: 10px 10px 10px 10px;
+  padding: 5px 30px 5px 3px;
+  max-width: 10px;
+}
+.class-mark-item-change {
+  background-color: rgb(0, 55, 128);
+  color: white;
+  margin: 1px;
+  padding: 5px 30px 5px 3px;
+  max-width: 10px;
 }
 </style>
