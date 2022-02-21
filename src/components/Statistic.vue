@@ -95,8 +95,9 @@
     <v-col>
       <v-data-table
         :headers="headers"
-        :items="this.marks"
-        :items-per-page="150"
+        :items="this.marksPrint"
+        :items-per-page="3000"
+        hide-default-footer
       >
       </v-data-table>
     </v-col>
@@ -112,8 +113,18 @@ export default {
     return {
       headers: [
         {
-          text: "Marks",
-          value: "classID",
+          text: "Класс",
+          value: "className",
+          sortable: true,
+        },
+        {
+          text: "Фамилия",
+          value: "LastName",
+          sortable: false,
+        },
+        {
+          text: "Имя",
+          value: "FirstName",
           sortable: false,
         },
         {
@@ -121,10 +132,17 @@ export default {
           value: "cat",
           sortable: false,
         },
+        {
+          text: "Причина",
+          value: "causesID",
+          sortable: false,
+        },
       ],
       marks: [],
+      marksPrint: [],
       sDates: [],
       classList: [],
+      studentsList: [{ FirstName: "1", LastName: "2" }],
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
       activeClassChange: "class-mark-item-change",
@@ -138,6 +156,22 @@ export default {
     },
     async findMarksThis() {
       this.classList.splice(0);
+      this.studentsList.splice(0);
+      this.marks.splice(0);
+      this.marksPrint.splice(0);
+      await TutorialDataService.findStudentByClassID().then((response) => {
+        var students = new Array();
+        students = Object.values(response.data);
+        for (var j = 0; j <= students.length - 1; j++) {
+          if (students[j] != undefined) {
+            this.studentsList.push(students[j]);
+          }
+          // this.$set(this.studentsList[j], "FirstName", students[j].FirstName);
+          // this.$set(this.studentsList[j], "LastName", students[j].LastName);
+          console.log("@@@", this.studentsList[j], j);
+        }
+      });
+
       TutorialDataService.getAllCLass()
         .then((response) => {
           this.classList = response.data.map(this.getDisplayClass);
@@ -147,33 +181,41 @@ export default {
         });
       var temp1;
       temp1 = { classID: null, date: this.sDates.date }; //this.sDates.date };
+
       await TutorialDataService.findMarks(temp1)
         .then((response) => {
           var a = new Array();
           a = Object.values(response.data);
+
+          console.log("111", a);
+          for (var p = 0; p < a.length; p++) {
+            if (a[p].causesID != "" && a[p].causesID != "Питался") {
+              this.marksPrint.push(a[p]);
+            }
+          }
           this.marks = a;
-          for (var t = 0; t <= this.marks.length; t++) {
-            for (var r = 0; r < this.classList; r++) {
-              console.log(this.classList[r]);
-              if (this.marks[t].classID === this.classList[r].classID) {
-                console.log(this.classList[r].classID);
-                this.$set(
-                  this.marks[t],
-                  "classID",
-                  this.classList[r].className
-                );
+
+          for (j = 0; j < this.classList.length; j++) {
+            for (i = 0; i < a.length; i++) {
+              if (this.classList[j].classID === a[i].classID) {
+                if (a[i].classID === this.classList[j].classID) {
+                  this.$set(a[i], "className", this.classList[j].className);
+                }
+
+                this.classList[j].marks.push(a[i]);
+
+                if (a[i].createdAt != a[i].updatedAt) {
+                  this.$set(this.classList[j], "change", true);
+                }
               }
             }
           }
-          for (var j = 0; j <= this.classList.length; j++) {
-            for (var i = 0; i < a.length; i++) {
-              if (this.classList[j].classID === a[i].classID) {
-                this.classList[j].marks.push(a[i]);
-                //  this.$push(this.classList[j].marks, a[i]);
-                if (a[i].createdAt != a[i].updatedAt) {
-                  // this.classList[j].change.push(true);
-                  this.$set(this.classList[j], "change", true);
-                }
+
+          for (var j = 0; j < a.length; j++) {
+            for (var i = 0; i <= this.studentsList.length - 1; i++) {
+              if (a[j].studentID === this.studentsList[i]._id) {
+                this.$set(a[j], "FirstName", this.studentsList[j].FirstName);
+                this.$set(a[j], "LastName", this.studentsList[j].LastName);
               }
             }
           }
@@ -187,9 +229,7 @@ export default {
 
     retrieveData() {
       //поставить текущую дату
-      console.log(this.sDates);
       document.getElementById("Date").value = new Date();
-      console.log(this.sDates);
       this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
 
       this.findMarksThis();
