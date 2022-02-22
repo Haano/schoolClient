@@ -24,7 +24,7 @@
           class="form-control"
           required
           v-model="sDates.date"
-          @change="load(sDates.date)"
+          @change="show()"
         />
         <div v-if="selectedClassID">
           <br />
@@ -181,7 +181,6 @@ export default {
     },
 
     async loadLastDay() {
-      await console.log(this.marks);
       var data = document.getElementById("Date").valueAsNumber;
       data = data - 86400000;
       var data2 = data;
@@ -191,10 +190,8 @@ export default {
       await this.pow(3, data, test, data2);
       let bottomHidden = document.querySelectorAll("#update");
 
-      console.log(bottomHidden);
       for (var i = 0; i < bottomHidden.length; i++) {
         bottomHidden[i].hidden = true;
-        console.log(bottomHidden[i]);
       }
     },
 
@@ -203,9 +200,6 @@ export default {
       //this.$set(this.causesDefault[0], "count", this.sClassInput.length);
       var b = a.options[a.selectedIndex || 0].value;
       mark.mark = b;
-      if (mark.mark === "") {
-        console.log(mark.mark, "MARK");
-      }
 
       // this.$set(this.mark, "mark", b);
 
@@ -225,7 +219,6 @@ export default {
       // console.log("!!!!!!!!! presentCount", presentCount);
 
       for (var i = 0; i < this.sClassInput.length; i++) {
-        console.log(this.sClassInput[i].date);
         if (
           this.sClassInput[i].mark === "Питался" ||
           this.sClassInput[i].mark === ""
@@ -252,6 +245,7 @@ export default {
       this.headers[4].text = data;
       this.marks = Array();
       this.marks.splice(0);
+
       for (var i = 0; i < this.sClassInput.length; i++) {
         this.$set(this.sClassInput[i], "date", "");
       }
@@ -272,7 +266,7 @@ export default {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
             this.$set(this.sClassInput[i], "date", this.marks[j].causesID);
             this.$set(this.sClassInput[i], "mark", this.marks[j].causesID);
-
+            this.$set(this.sClassInput[i], "Category", this.marks[j].cat);
             for (var c = 0; c < this.causes.length; c++) {
               if (this.causes[c].causes === this.marks[j].causesID) {
                 this.$set(this.causes[c], "count", (this.causes[c].count += 1));
@@ -301,7 +295,6 @@ export default {
       this.$set(this.causesDefault[0], "count", this.sClassInput.length);
 
       let toDay = new Date().toISOString().slice(0, 10);
-      console.log("TOOOODAAAAY", toDay);
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
       if (this.marks.length > 0) {
         document.getElementById("loadLast").disabled = true;
@@ -325,8 +318,6 @@ export default {
         document.getElementById("loadLast").disabled = false;
         document.getElementById("sendData").disabled = false;
       }
-
-      console.log(this.sClassInput, "CLASSSSSSS");
     },
 
     async selectedSelect() {
@@ -340,11 +331,6 @@ export default {
 
             if (a.options[j].text === "") {
               a.name = "";
-              console.log(
-                "OPTIONS",
-                a.options[j].text,
-                this.sClassInput[i]._id
-              );
             } else {
               a.name = a.options[j].text;
             }
@@ -364,8 +350,6 @@ export default {
           // }
         }
       }
-      // console.log("END");
-      // console.log(this.sDates);
     },
 
     async findMarksThis(data) {
@@ -376,17 +360,11 @@ export default {
           var a = new Array();
           a = Object.values(response.data);
           temp1 = response.data;
-          // if (a.length > 0) {
-          //   console.log("@@@нашелЯ", response.data);
-          // } else {
-          //   console.log("@@@@НЕнашелЯ", response.data);
-          // }
+
           for (var i = 0; i < a.length; i++) {
             if (a[i].createdAt === a[i].updatedAt) {
-              console.log("Я ПОЛУЧИЛ МАРКУ", a[i].createdAt, a[i].updatedAt);
               a[i].change = true;
             } else {
-              console.log("@@@@@@@@@", a[i].createdAt, a[i].updatedAt);
               a[i].change = false;
             }
             this.$set(this.marks, i, a[i]);
@@ -396,7 +374,6 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-      console.log("Я ПОЛУЧИЛ ВСЕ", this.marks);
       return temp1;
     },
 
@@ -406,7 +383,6 @@ export default {
       for (var j = 0; j < this.marks.length; j++) {
         if (this.marks[j].studentID === data._id) {
           markID = this.marks[j]._id;
-          console.log("Я НАШЕЛ СТУДЕНТА", datas);
         }
       }
       var datas = {
@@ -420,7 +396,6 @@ export default {
         .catch((e) => {
           console.log("1111111111", e);
         });
-      console.log("вывел2", data._id);
 
       document.getElementById(data._id + "update").disabled = true;
     },
@@ -459,13 +434,10 @@ export default {
           console.log("1111111111", e);
         });
 
-      console.log(document.getElementById("sendData"));
       document.getElementById("sendData").disabled = true;
       let bottomHidden = document.querySelectorAll("#update");
-      console.log(bottomHidden);
       for (i = 0; i < bottomHidden.length; i++) {
         bottomHidden[i].hidden = false;
-        console.log(bottomHidden[i]);
         bottomHidden[i].style = "display: flex";
       }
       document.getElementById("loadLast").disabled = true;
@@ -474,6 +446,8 @@ export default {
     },
 
     show(data) {
+      data = this.selectedClassID;
+      console.log(data);
       TutorialDataService.findStudentByClassID(data)
         .then((response) => {
           this.sClassInput.splice(response.data);
@@ -495,9 +469,7 @@ export default {
 
     retrieveClass() {
       //поставить текущую дату
-      console.log(this.sDates);
       document.getElementById("Date").value = new Date();
-      console.log(this.sDates);
       this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
       // добавить колонку с датой и выбором
       this.$set(this.headers, 4, {

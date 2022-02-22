@@ -66,6 +66,9 @@ class TutorialDataService {
   createCategory(data) {
     return http.post("/createCategory", data);
   }
+  updateCat(id, data) {
+    return http.put(`/updateCat/${id}`, data);
+  }
 
   createCauses(data) {
     return http.post("/createCauses", data);

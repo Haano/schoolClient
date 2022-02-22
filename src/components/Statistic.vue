@@ -1,24 +1,10 @@
 <template>
   <div>
-    <div class="cat">
-      <div class="cat-item">
-        <input
-          type="date"
-          id="Date"
-          class="form-control"
-          required
-          v-model="sDates.date"
-          @change="findMarksThis()"
-        />
-        <button @click="findMarksThis()" class="btn btn-success">
-          Обновить
-        </button>
-      </div>
-    </div>
     <div class="shift-name">
       <div class="class-mark">
         <div class="class-mark-item-text">1 смена</div>
       </div>
+
       <div class="class-mark">
         <div class="class-mark-item-text">2 смена</div>
       </div>
@@ -60,6 +46,21 @@
           </div>
         </div>
       </div>
+      <div class="cat">
+        <div class="cat-item">
+          <input
+            type="date"
+            id="Date"
+            class="form-control"
+            required
+            v-model="sDates.date"
+            @change="findMarksThis()"
+          />
+          <button @click="findMarksThis()" class="btn btn-success">
+            Обновить
+          </button>
+        </div>
+      </div>
       <div class="class-mark">
         <div v-for="value in classList" :key="value.classname">
           <div
@@ -91,17 +92,17 @@
         </div>
       </div>
     </div>
-
-    <v-col>
-      <v-data-table
-        :headers="headers"
-        :items="this.marksPrint"
-        :items-per-page="3000"
-        hide-default-footer
-      >
-      </v-data-table>
-    </v-col>
-
+    <div class="myTable">
+      <v-col>
+        <v-data-table
+          :headers="headers"
+          :items="this.marksPrint"
+          :items-per-page="3000"
+          hide-default-footer
+        >
+        </v-data-table>
+      </v-col>
+    </div>
     <button @click="help()" class="btn btn-success">Помощь</button>
   </div>
 </template>
@@ -119,19 +120,19 @@ export default {
         },
         {
           text: "Фамилия",
-          value: "LastName",
-          sortable: false,
-        },
-        {
-          text: "Имя",
           value: "FirstName",
           sortable: false,
         },
         {
-          text: "Категория",
-          value: "cat",
+          text: "Имя",
+          value: "LastName",
           sortable: false,
         },
+        // {
+        //   text: "Категория",
+        //   value: "cat",
+        //   sortable: false,
+        // },
         {
           text: "Причина",
           value: "causesID",
@@ -159,6 +160,8 @@ export default {
       this.studentsList.splice(0);
       this.marks.splice(0);
       this.marksPrint.splice(0);
+
+      //получить список всех учеников (запись в переменную students)
       await TutorialDataService.findStudentByClassID().then((response) => {
         var students = new Array();
         students = Object.values(response.data);
@@ -168,10 +171,10 @@ export default {
           }
           // this.$set(this.studentsList[j], "FirstName", students[j].FirstName);
           // this.$set(this.studentsList[j], "LastName", students[j].LastName);
-          console.log("@@@", this.studentsList[j], j);
         }
       });
 
+      //получить список всех классов (classList)
       TutorialDataService.getAllCLass()
         .then((response) => {
           this.classList = response.data.map(this.getDisplayClass);
@@ -182,12 +185,12 @@ export default {
       var temp1;
       temp1 = { classID: null, date: this.sDates.date }; //this.sDates.date };
 
+      // получить отметки за день marks - все, marksPrint - только те, которые НЕ Питался и НЕ пустые
       await TutorialDataService.findMarks(temp1)
         .then((response) => {
           var a = new Array();
           a = Object.values(response.data);
 
-          console.log("111", a);
           for (var p = 0; p < a.length; p++) {
             if (a[p].causesID != "" && a[p].causesID != "Питался") {
               this.marksPrint.push(a[p]);
@@ -195,27 +198,49 @@ export default {
           }
           this.marks = a;
 
-          for (j = 0; j < this.classList.length; j++) {
-            for (i = 0; i < a.length; i++) {
-              if (this.classList[j].classID === a[i].classID) {
-                if (a[i].classID === this.classList[j].classID) {
-                  this.$set(a[i], "className", this.classList[j].className);
+          //поместить в массив marksPrint имя класса, для отображения в таблице, а также для плиток сдачи отчета (зеленые, синие)
+          for (var i = 0; i < this.classList.length; i++) {
+            for (p = 0; p < this.marks.length; p++) {
+              if (this.marks[p].classID === this.classList[i].classID) {
+                this.classList[i].marks.push(this.marks[p].causesID);
+                console.log("НАшел student");
+                if (this.marks[p].createdAt != this.marks[p].updatedAt) {
+                  this.$set(this.classList[i], "change", true);
                 }
-
-                this.classList[j].marks.push(a[i]);
-
-                if (a[i].createdAt != a[i].updatedAt) {
-                  this.$set(this.classList[j], "change", true);
-                }
+              }
+            }
+            for (var j = 0; j < this.marksPrint.length; j++) {
+              if (this.marksPrint[j].classID === this.classList[i].classID) {
+                this.$set(
+                  this.marksPrint[j],
+                  "className",
+                  this.classList[i].className
+                );
+                // this.classList[i].marks.push(a[i]);
+                // if (
+                //   this.marksPrint[j].createdAt != this.marksPrint[j].updatedAt
+                // ) {
+                //   this.$set(this.classList[i], "change", true);
+                // }
               }
             }
           }
 
-          for (var j = 0; j < a.length; j++) {
-            for (var i = 0; i <= this.studentsList.length - 1; i++) {
-              if (a[j].studentID === this.studentsList[i]._id) {
-                this.$set(a[j], "FirstName", this.studentsList[j].FirstName);
-                this.$set(a[j], "LastName", this.studentsList[j].LastName);
+          // поместить в массив  marksPrint имена и фамилии учеников
+          console.log("STUDENST LIST", this.studentsList);
+          for (i = 0; i < this.studentsList.length; i++) {
+            for (j = 0; j < this.marksPrint.length; j++) {
+              if (this.marksPrint[j].studentID === this.studentsList[i]._id) {
+                this.$set(
+                  this.marksPrint[j],
+                  "FirstName",
+                  this.studentsList[i].FirstName
+                );
+                this.$set(
+                  this.marksPrint[j],
+                  "LastName",
+                  this.studentsList[i].LastName
+                );
               }
             }
           }
@@ -224,6 +249,7 @@ export default {
           console.log(e);
         });
 
+      console.log(this.marks);
       return temp1;
     },
 
@@ -269,7 +295,7 @@ export default {
 }
 
 .class-mark {
-  max-width: 450px;
+  max-width: 650px;
   display: flex;
   justify-self: center;
   margin: 0 0px;

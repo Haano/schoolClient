@@ -27,7 +27,7 @@
         <br />
       </div>
       <div>
-        Категория
+        Смена
         <select class="form-select" v-model="sclass.shiftSchool">
           <option
             v-for="cat in sShift"
