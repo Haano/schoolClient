@@ -5,7 +5,7 @@
         <br />
         Класс
         <select
-          class="form-select success"
+          class="form-select light"
           v-model="selectedClassID"
           @change="getStudents(selectedClassID)"
         >
@@ -90,7 +90,7 @@
         </button>
       </div>
     </div>
-    \
+
     <div>
       <div class="myTable">
         <v-col>
