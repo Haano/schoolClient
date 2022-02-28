@@ -38,6 +38,14 @@
           <button @click="initialization()" class="btn btn-success">
             Обновить
           </button>
+          <div class="flex-ul">
+            <ul>
+              <li>Всего учеников: {{ studentsList.length }}</li>
+              <li>Учеников на дату: {{ marks.length }}</li>
+              <li>Отсутствует: {{ marksPrint.length }}</li>
+              <li>Отсутствует: {{}}</li>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="class-mark">
@@ -109,6 +117,7 @@ export default {
       sDates: [],
       classList: [],
       studentsList: [{ FirstName: "1", LastName: "2" }],
+      countAll: {},
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
       activeClassChange: "class-mark-item-change",
@@ -129,6 +138,7 @@ export default {
 
     clearFullData() {
       this.classList = [];
+      this.studentsList = [];
       this.marks = [];
       this.students = [];
       this.marksPrint = [];
@@ -193,7 +203,7 @@ export default {
 
     help() {
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения",
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения"
       );
     },
     async getFullNameStudents() {
@@ -204,12 +214,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName,
+              this.studentsList[i].FirstName
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName,
+              this.studentsList[i].LastName
             );
           }
         }
