@@ -38,14 +38,7 @@
           <button @click="initialization()" class="btn btn-success">
             Обновить
           </button>
-          <div class="flex-ul">
-            <ul>
-              <li>Всего учеников: {{ studentsList.length }}</li>
-              <li>Учеников на дату: {{ marks.length }}</li>
-              <li>Отсутствует: {{ marksPrint.length }}</li>
-              <li>Отсутствует: {{}}</li>
-            </ul>
-          </div>
+          <button @click="dayin()" class="btn btn-secondary">Печать</button>
         </div>
       </div>
       <div class="class-mark">
@@ -64,7 +57,18 @@
       </div>
     </div>
 
-    <div class="myTable">
+    <div>
+      <ul class="ul-stat" id="ul-stat">
+        <li>Всего учеников: {{ studentsList.length }}</li>
+        <li>Данные отправлены на: {{ marks.length }}</li>
+        <li>Отсутствует: {{ marksPrint.length }}</li>
+        <li v-for="caus in countAll" :key="caus.causes">
+          {{ caus.causes }} = {{ caus.count }}
+        </li>
+      </ul>
+    </div>
+
+    <div class="myTable" id="table">
       <v-col>
         <v-data-table
           :headers="headers"
@@ -117,7 +121,7 @@ export default {
       sDates: [],
       classList: [],
       studentsList: [{ FirstName: "1", LastName: "2" }],
-      countAll: {},
+      countAll: [{ causes: "21231" }],
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
       activeClassChange: "class-mark-item-change",
@@ -132,7 +136,7 @@ export default {
       await this.getMarks(); // получить все марки (marks and marksPrint)
       await this.findAllStudents(); // получить всех учеников (students)
       await this.defineTileColorClass(); //покрасить плитки в нужный цвет
-
+      await this.countStat();
       //посчитать данные
     },
 
@@ -142,6 +146,7 @@ export default {
       this.marks = [];
       this.students = [];
       this.marksPrint = [];
+      this.countAll = [{ causes: "1", count: 0 }];
     },
 
     async getAllClass() {
@@ -160,7 +165,6 @@ export default {
         date: this.sDates.date,
       })
         .then((response) => {
-          console.log("MARKS", this.sDates.date);
           this.getMarksToPrint(Object.values(response.data));
           this.marks = Object.values(response.data);
         })
@@ -202,6 +206,13 @@ export default {
     },
 
     help() {
+      console.log("Data", this.sDates.date);
+      console.log("this.marks", this.marks);
+      console.log("this.marksPrint", this.marksPrint);
+      console.log("this.classList", this.classList);
+      console.log("this.studentsList", this.studentsList);
+      console.log("this.marks", this.marks);
+      console.log("this.countAll", this.countAll);
       alert(
         "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения"
       );
@@ -228,6 +239,70 @@ export default {
       return;
     },
 
+    async countStat() {
+      let set = new Set();
+      let arr = [];
+      let obj = {};
+      for (let i = 0; i < this.marks.length; i++) {
+        set.add(this.marks[i].causesID);
+      }
+      i = 0;
+      for (let value of set) {
+        obj = { causes: value, count: 0 };
+
+        this.countAll[i] = obj;
+        if (value === "" && i != 0) {
+          let temp = this.countAll[0];
+          this.countAll[0] = this.countAll[i];
+          this.countAll[i] = temp;
+        } else {
+          if (this.countAll[0].causes === "") {
+            if (value === "Питался" && i != 1) {
+              let temp = this.countAll[1];
+              this.countAll[1] = this.countAll[i];
+              this.countAll[i] = temp;
+            } else {
+              this.countAll[i] = obj;
+            }
+          } else {
+            if (value === "Питался" && i != 0) {
+              let temp = this.countAll[0];
+              this.countAll[0] = this.countAll[i];
+              this.countAll[i] = temp;
+            } else {
+              this.countAll[i] = obj;
+            }
+          }
+        }
+        arr[i] = obj;
+        i += 1;
+      }
+      for (i = 0; i < this.marks.length; i++) {
+        for (let j = 0; j < arr.length; j++) {
+          if (this.marks[i].causesID === arr[j].causes) {
+            arr[j].count++;
+          }
+        }
+      }
+
+      let i, temp;
+      for (let j = 0; j < arr.length; j++) {
+        if (arr[j].causes === "") {
+          arr[j].causes = "Присутствует";
+          temp = j;
+        }
+        if (arr[j].causes === "Питался") {
+          i = j;
+        }
+      }
+      console.log(arr);
+      if (temp) {
+        arr[temp].count = arr[temp].count + arr[i].count;
+      }
+
+      this.$set(this.countAll, arr);
+    },
+
     retrieveData() {
       //поставить текущую дату
       document.getElementById("Date").value = new Date();
@@ -241,6 +316,30 @@ export default {
         shift: data.shift,
         change: false,
       };
+    },
+
+    // Метод печати
+    dayin() {
+      //let dataReportBox = document.getElementById("table"); // Получаем узел содержимого для печати
+      // Берем узел, который не отображается, можно скрыть или удалить узел
+      // let top = document.getElementsByClassName("top")[0];
+      // dataReportBox.removeChild(top);
+
+      // Создаем нужные вам узлы
+      //
+      //$("# dataReportBox").prepend(topdiv); // Вставляем вновь созданный узел div в верхнюю часть содержимого контейнера dataReportBox
+      let data = this.sDates.date;
+      // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
+      let top = "<h1> МБОУ СОШ №24</h1> <h2>Отсутствующие на " + data + "</h2>";
+      let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
+      let printHtml2 = document.getElementById("ul-stat").innerHTML;
+
+      printHtml2 += printHtml;
+      top += printHtml2;
+      window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
+
+      window.print(); // Вызов метода печати
+      window.location.reload(); // Страница перезагружается после печати
     },
   },
   mounted() {
