@@ -188,10 +188,37 @@ export default {
   },
 
   methods: {
+    initialization() {
+      this.clearFullData();
+      this.retrieveTutorials();
+      this.retrieveCategory();
+      if (this.selectedClassID) {
+        this.classList.splice(0);
+        this.getStudents(this.selectedClassID);
+      } else {
+        this.classList.splice(0);
+      }
+      console.log(this.classList);
+    },
+    clearFullData() {
+      this.classList.splice(0);
+    },
+
+    deleteStudent(id) {
+      TutorialDataService.deleteStudent(id)
+        .then(() => {
+          this.initialization();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      this.initialization();
+    },
+
     async updateCat(ID) {
       var data = new Array();
       data[0] = document.getElementById(ID).value;
-      console.log(ID, data);
 
       await TutorialDataService.updateCat(ID, data)
         .then((response) => {
@@ -200,8 +227,7 @@ export default {
         .catch((e) => {
           console.log("1111111111", e);
         });
-      console.log("1111111111", this.selectedClassID.classID);
-      this.getStudents(this.selectedClassID);
+      this.initialization();
     },
 
     getStudents(data) {
@@ -217,7 +243,6 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-      console.log(this.classList);
     },
 
     createStudent() {
@@ -239,18 +264,13 @@ export default {
         .catch((e) => {
           console.log("1111111111", e);
         });
-    },
-
-    deleteStudent(id) {
-      console.log(id);
+      this.initialization();
     },
 
     retrieveCategory() {
       TutorialDataService.getCategory()
         .then((response) => {
           this.sCategory = response.data.map(this.getDisplayCategory);
-          console.log("sdasdad", response.data);
-          console.log("sdasdad", this.sCategory);
         })
         .catch((e) => {
           console.log(e);
@@ -267,8 +287,7 @@ export default {
         });
     },
     refreshList() {
-      this.retrieveTutorials();
-      this.retrieveCategory();
+      this.initialization();
     },
 
     getDisplayTutorial(data) {
@@ -279,7 +298,6 @@ export default {
     },
 
     getDisplayCategory(data) {
-      console.log("dadadadad", data);
       return {
         Category: data.cat,
       };

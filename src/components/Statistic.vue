@@ -59,7 +59,14 @@
 
     <div>
       <ul class="ul-stat" id="ul-stat">
-        <li>Всего учеников: {{ studentsList.length }}</li>
+        <li>
+          Всего учеников:
+          <b style="padding: 0 5px 0 5px">
+            {{ studentsList.length }} (на
+            {{ new Date().toLocaleDateString() }})</b
+          >
+        </li>
+
         <li>Данные отправлены на: {{ marks.length }}</li>
         <li>Отсутствует: {{ marksPrint.length }}</li>
         <li v-for="caus in countAll" :key="caus.causes">
@@ -218,9 +225,11 @@ export default {
       );
     },
     async getFullNameStudents() {
+      let change = false;
       // поместить в массив  marksPrint имена и фамилии учеников
-      for (let i = 0; i < this.studentsList.length; i++) {
-        for (let j = 0; j < this.marksPrint.length; j++) {
+      for (let j = 0; j < this.marksPrint.length; j++) {
+        change = false;
+        for (let i = 0; i < this.studentsList.length; i++) {
           if (this.marksPrint[j].studentID === this.studentsList[i]._id) {
             this.$set(
               this.marksPrint[j],
@@ -232,7 +241,15 @@ export default {
               "LastName",
               this.studentsList[i].LastName
             );
+            change = true;
+            console.log(" BREAK j", j);
+            break;
           }
+          console.log("j", j);
+        }
+        if (!change) {
+          this.$set(this.marksPrint[j], "FirstName", "DELETE");
+          this.$set(this.marksPrint[j], "LastName", "DELETE");
         }
       }
 

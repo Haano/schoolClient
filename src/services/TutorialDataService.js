@@ -58,6 +58,9 @@ class TutorialDataService {
   createStudent(data) {
     return http.post("/createStudent", data);
   }
+  deleteStudent(id) {
+    return http.delete(`/student/${id}`);
+  }
 
   findStudentByClassID(classID) {
     return http.post(`/findStudentByClassID/id=`, classID);
