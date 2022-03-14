@@ -28,7 +28,7 @@
         />
         <div v-if="selectedClassID">
           <br />
-          <button @click="loadLastDay" id="loadLast" class="btn btn-success">
+          <button @click="loadLastDay()" id="loadLast" class="btn btn-success">
             Загрузить значения прошлого дня
           </button>
         </div>
