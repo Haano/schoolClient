@@ -38,7 +38,7 @@
           <button @click="initialization()" class="btn btn-success">
             Обновить
           </button>
-          <button @click="dayin()" class="btn btn-secondary">Печать</button>
+          <button @click="printStat()" class="btn btn-secondary">Печать</button>
         </div>
       </div>
       <div class="class-mark">
@@ -319,7 +319,7 @@ export default {
     },
 
     // Метод печати
-    dayin() {
+    printStat() {
       //let dataReportBox = document.getElementById("table"); // Получаем узел содержимого для печати
       // Берем узел, который не отображается, можно скрыть или удалить узел
       // let top = document.getElementsByClassName("top")[0];
@@ -349,7 +349,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 @import "../assets/style.css";
 .shift-name {
   display: flex;
@@ -398,5 +398,14 @@ export default {
   margin: 1px;
   padding: 5px 30px 5px 3px;
   max-width: 10px;
+}
+
+.v-data-table td {
+  border-bottom: none !important;
+  height: 2px !important;
+}
+
+.v-data-table tbody tr:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
 }
 </style>

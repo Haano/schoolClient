@@ -123,6 +123,18 @@
                 </v-card-actions>
               </div>
             </template>
+            <template v-slot:[`item.delete`]="{ item }">
+              <div class="select-flex">
+                <v-card-actions>
+                  <button
+                    class="btn btn-danger"
+                    @click="deleteStudent(item._id)"
+                  >
+                    Удалить
+                  </button>
+                </v-card-actions>
+              </div>
+            </template>
           </v-data-table>
         </v-col>
       </div>
@@ -154,7 +166,13 @@ export default {
           value: "Category",
           sortable: true,
         },
+
         { text: "Обновить категорию", value: "actions", sortable: false },
+        {
+          text: "Действия",
+          value: "delete",
+          sortable: true,
+        },
       ],
       sClass: [{ className: "NO" }],
       sCategory: [{ Category: "1" }],
@@ -185,6 +203,7 @@ export default {
       console.log("1111111111", this.selectedClassID.classID);
       this.getStudents(this.selectedClassID);
     },
+
     getStudents(data) {
       TutorialDataService.findStudentByClassID(data)
         .then((response) => {
@@ -200,6 +219,7 @@ export default {
         });
       console.log(this.classList);
     },
+
     createStudent() {
       var data = {
         classID: this.selectedClassID.classID,
@@ -219,6 +239,10 @@ export default {
         .catch((e) => {
           console.log("1111111111", e);
         });
+    },
+
+    deleteStudent(id) {
+      console.log(id);
     },
 
     retrieveCategory() {
