@@ -124,3 +124,24 @@ navbar {
 .cat-item button {
   margin: 10px 0px;
 }
+
+.flex-food-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.flex-food {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.flex-food > div {
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  width: 350px;
+  padding: 0px 20px 20px;
+}
