@@ -39,20 +39,39 @@
           </div>
         </div>
         <div class="flex-food">
-          <div>Время <input class="form-control" /></div>
-          <div>Идентификатор <input class="form-control" /></div>
+          <div>
+            Время <b style="color: red">*</b><input class="form-control" />
+          </div>
+          <div>
+            Идентификатор (СУИП) <b style="color: red">*</b
+            ><input class="form-control" />
+          </div>
         </div>
         <div class="flex-food">
           <div>
             Сумма квитанции<br />
-            (только число) <input class="form-control" />
+            (только число) <b style="color: red">*</b>
+            <input class="form-control" />
           </div>
+          <div style="margin: 24px 0 0 0">
+            Период <b style="color: red">*</b>
+            <input class="form-control" />
+          </div>
+        </div>
+        <div class="flex-food">
           <div>
             <div>
               Можно загрузить<br />
               файл квитанции
             </div>
-            <input type="file" class="form-control" name="" id="" />
+            <input
+              type="file"
+              id="file"
+              ref="file"
+              class="form-control"
+              name=""
+              v-on:change="handleFileUpload()"
+            />
           </div>
         </div>
         <div class="flex-food">
@@ -119,14 +138,18 @@
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
+//import axios from "axios";
 export default {
   data() {
     return {
+      file: "",
+      month: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Январь"],
       headers: [
         { text: "Фамилия", value: "FirstName" },
         { text: "Имя", value: "lastName" },
         { text: "Дата", value: "date" },
         { text: "ID", value: "identifier" },
+        { text: "Период", value: "period" },
         { text: "Сумма", value: "amount" },
         { text: "Действия", value: "actions", sortable: false },
       ],
@@ -180,6 +203,44 @@ export default {
       await this.getStudents(data);
     },
 
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+      console.log(this.file);
+    },
+
+    test() {
+      // this.handleFileUpload();
+      const data = new FormData();
+      data.append("file", this.file);
+      TutorialDataService.sendFile(data)
+        .then(
+          (res) =>
+            function () {
+              console.log("SUCCESS!!");
+
+              res.data.files; // binary representation of the file
+              res.status; // HTTP status
+            }
+        )
+        .catch(
+          (res) =>
+            function () {
+              console.log("FAILURE!!", res.data.files, res.status);
+            }
+        );
+      // axios
+      //   .post("http://192.168.1.152:8081/single-file", formData, {
+      //     headers: {
+      //       "Content-Type": "multipart/form-data",
+      //     },
+      //   })
+      //   .then(function () {
+      //     console.log("SUCCESS!!");
+      //   })
+      //   .catch(function () {
+      //     console.log("FAILURE!!");
+      //   });
+    },
     getStudents(data) {
       TutorialDataService.findStudentByClassID(data)
         .then((response) => {

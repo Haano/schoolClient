@@ -90,6 +90,10 @@ class TutorialDataService {
   updateMark(id, data) {
     return http.put(`/updateMark/${id}`, data);
   }
+
+  sendFile(data) {
+    return http.post(`/single-file`, data);
+  }
 }
 
 export default new TutorialDataService();

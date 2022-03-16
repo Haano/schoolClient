@@ -57,9 +57,9 @@ export default new Router({
       component: () => import("./components/Statistic"),
     },
     {
-      path: "/foodStat",
-      name: "foodStat",
-      component: () => import("./components/FoodStat"),
+      path: "/Receipt",
+      name: "Receipt",
+      component: () => import("./components/Receipt"),
     },
   ],
 });

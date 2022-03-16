@@ -129,6 +129,7 @@ navbar {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .flex-food {
@@ -144,4 +145,5 @@ navbar {
   align-items: center;
   width: 350px;
   padding: 0px 20px 20px;
+  flex-wrap: wrap;
 }

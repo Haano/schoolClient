@@ -10,7 +10,7 @@
       <!-- <v-btn to="/CreateStudent" text> Ученики </v-btn> -->
       <!-- <v-btn to="/Categories" text> Категории </v-btn> -->
       <v-btn to="/Statistic" text> Статистика </v-btn>
-      <v-btn to="/foodStat" text> Питание </v-btn>
+      <v-btn to="/Receipt" text> Квитанции </v-btn>
 
       <!-- <v-btn to="/CreateDate" text> Даты </v-btn> -->
 
