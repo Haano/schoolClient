@@ -127,7 +127,7 @@ navbar {
 
 .flex-food-main {
   display: flex;
-  flex-direction: row;
+  flex-direction: baseline;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -143,7 +143,15 @@ navbar {
   justify-content: center;
   flex-direction: row;
   align-items: center;
-  width: 350px;
-  padding: 0px 20px 20px;
+  width: 250px;
+  padding: 0px 5px 2px;
   flex-wrap: wrap;
+}
+.flex-food-main > span {
+  max-width: 90%;
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left-color: #b4b4b4; /* Цвет линии слева */
+  border-left-style: dotted; /* Стиль линии */
+  border-left-width: 3px; /* Толщина линии */
 }

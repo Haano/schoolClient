@@ -1,6 +1,12 @@
 import http from "../http-common";
 
 class TutorialDataService {
+  //reciept
+  createReciept(data) {
+    return http.post("/createReciept", data);
+  }
+
+  //reciept***
   getAll() {
     return http.get("/tutorials");
   }

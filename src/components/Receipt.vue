@@ -9,7 +9,7 @@
             <select
               class="form-select"
               v-model="selectedClassID"
-              @change="show(selectedClassID)"
+              @change="changeClass(selectedClassID)"
             >
               <option
                 v-for="user in sClass"
@@ -26,8 +26,9 @@
             <select
               class="form-select"
               v-model="selectedStudentID"
-              @change="show(selectedStudentID)"
+              @change="changeStudent(selectedStudentID)"
             >
+              <option>Все</option>
               <option
                 v-for="user in Students"
                 :key="user.FirstName"
@@ -40,25 +41,32 @@
         </div>
         <div class="flex-food">
           <div>
-            Время <b style="color: red">*</b><input class="form-control" />
+            Дата оплаты <b style="color: red">*</b
+            ><input
+              type="date"
+              v-model="date"
+              required
+              v-on:change="changeDate(date)"
+              class="form-control"
+            />
           </div>
           <div>
             Идентификатор (СУИП) <b style="color: red">*</b
-            ><input class="form-control" />
+            ><input class="form-control" v-model="identifier" />
           </div>
         </div>
         <div class="flex-food">
           <div>
             Сумма квитанции<br />
             (только число) <b style="color: red">*</b>
-            <input class="form-control" />
+            <input class="form-control" v-model="amount" />
           </div>
           <div style="margin: 24px 0 0 0">
             Период <b style="color: red">*</b>
             <input class="form-control" />
           </div>
         </div>
-        <div class="flex-food">
+        <div class="flex-food-main">
           <div>
             <div>
               Можно загрузить<br />
@@ -72,7 +80,13 @@
               name=""
               v-on:change="handleFileUpload()"
             />
+            <br />
           </div>
+        </div>
+        <div class="flex-food">
+          Дата: {{ new Date(date).toLocaleDateString() }} <br />
+          ID: {{ identifier }} <br />
+          Сумма квитанции: {{ amount }} <br />
         </div>
         <div class="flex-food">
           <button @click="test()" class="btn btn-success">
@@ -81,7 +95,9 @@
         </div>
       </div>
       <br />
-      <div>
+      <span>
+        Расчет по стоимости порции:
+        <input type="text" class="form-control" v-model="foodPrice" />
         <br />
         <table class="table table-bordered">
           <caption>
@@ -93,6 +109,7 @@
               <th scope="col">Всего питались</th>
               <th scope="col">Стоимость</th>
               <th scope="col">Денег сдано</th>
+              <th scope="col" style="color: red">Долг</th>
             </tr>
           </thead>
           <tbody>
@@ -100,22 +117,46 @@
               <td>
                 <b>{{ selectedClassID.className }}</b>
               </td>
-              <td>{{ sClass.length }}</td>
-              <td>{{ selectedClassID.className }}</td>
+              <td>{{ amountFood.amount }}</td>
+              <td>{{ amountFood.amount * foodPrice }}</td>
               <td>{{ amount }}</td>
-            </tr>
-            <tr>
-              <td>
-                <b
-                  >{{ selectedStudentID.FirstName }}<br />
-                  {{ selectedStudentID.LastName }}</b
-                >
+              <td style="color: red">
+                {{ amount - amountFood.amount * foodPrice }}
               </td>
-              <td>{{ selectedStudentID.LastName }}</td>
             </tr>
+            <tr v-for="item in sCategory" :key="item.message">
+              <td>{{ item.sCategory }}</td>
+              <td>{{ item.count }}</td>
+              <td>{{ item.count * foodPrice }}</td>
+            </tr>
+            <template v-if="!chek">
+              <tr>
+                <td style="width: 200px">
+                  <b
+                    >{{ selectedStudentID.FirstName }}
+                    {{ selectedStudentID.LastName }}
+                    {{ selectedStudentID.Category }}</b
+                  >
+                </td>
+                <td>{{ amountStudentFood.amount }}</td>
+                <td>{{ amountStudentFood.amount * foodPrice }}</td>
+              </tr>
+            </template>
+            <template v-if="chek">
+              <tr v-for="item in Students" :key="item.FirstName">
+                <td style="width: 200px">
+                  <b
+                    >{{ item.FirstName }} {{ item.LastName }}
+                    {{ item.Category }}</b
+                  >
+                </td>
+                <td>{{ item.amount }}</td>
+                <td>{{ item.amount * foodPrice }}</td>
+              </tr>
+            </template>
           </tbody>
         </table>
-      </div>
+      </span>
     </div>
     <br />
     <v-data-table
@@ -142,6 +183,14 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      identifier: "",
+      date: new Date(), //.toLocaleDateString(),
+      chek: false,
+      sCategory: [],
+      foodPrice: 25,
+      marks: [],
+      amountFood: { amount: 0 },
+      amountStudentFood: { amount: 0 },
       file: "",
       month: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Январь"],
       headers: [
@@ -198,9 +247,81 @@ export default {
     };
   },
   methods: {
-    async show(data) {
-      console.log(data);
+    async changeClass(data) {
       await this.getStudents(data);
+      await this.getMarks(data);
+      await this.getAmountCategory();
+      this.amountMarksFood();
+    },
+    changeStudent(student) {
+      for (let j = 0; j < this.Students.length; j++) {
+        this.Students[j].amount = 0;
+      }
+
+      if (student != "Все") {
+        this.chek = false;
+        this.amountStudentFood.amount = 0;
+        console.log(student);
+        for (let i = 0; i < this.marks.length; i++) {
+          if (
+            this.marks[i].studentID === student._id &&
+            this.marks[i].causesID === "Питался"
+          ) {
+            this.amountStudentFood.amount += 1;
+          }
+        }
+      } else {
+        this.chek = true;
+        this.amountStudentFood.amount = 0;
+        console.log(this.Students);
+        for (let i = 0; i < this.marks.length; i++) {
+          for (let j = 0; j < this.Students.length; j++)
+            if (
+              this.marks[i].studentID === this.Students[j]._id &&
+              this.marks[i].causesID === "Питался"
+            ) {
+              this.Students[j].amount += 1;
+            }
+        }
+        console.log("DCT");
+      }
+    },
+
+    async getMarks(ID) {
+      await TutorialDataService.findMarks({
+        classID: ID,
+      })
+        .then((response) => {
+          //this.getMarksToPrint(Object.values(response.data));
+          console.log("ответ", response.data);
+          this.marks = Object.values(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      console.log(this.mark);
+    },
+    getAmountCategory() {
+      for (let j = 0; j < this.sCategory.length; j++) {
+        this.sCategory[j].count = 0;
+      }
+      console.log("!!!!!", this.marks, this.sCategory);
+      for (let i = 0; i < this.marks.length; i++) {
+        for (let j = 0; j < this.sCategory.length; j++) {
+          if (this.marks[i].cat === this.sCategory[j].sCategory) {
+            this.sCategory[j].count += 1;
+          }
+        }
+      }
+    },
+
+    amountMarksFood() {
+      this.amountFood.amount = 0;
+      for (let i = 0; i < this.marks.length; i++) {
+        if (this.marks[i].causesID === "Питался") {
+          this.amountFood.amount += 1;
+        }
+      }
     },
 
     handleFileUpload() {
@@ -248,13 +369,20 @@ export default {
           var a = new Array();
           a = Object.values(response.data);
           for (var i = 0; i < a.length; i++) {
+            a[i].amount = 0;
             this.$set(this.Students, i, a[i]);
+            // this.$set(this.Students[i], amount, 0);
           }
         })
         .catch((e) => {
           console.log(e);
         });
-      console.log(this.Students);
+    },
+
+    changeDate(value) {
+      let a = new Date(value);
+      console.log(value, a);
+      this.date = value;
     },
 
     async retrieveClass() {
@@ -270,7 +398,25 @@ export default {
           console.log(e);
         });
     },
+    async retriveCategory() {
+      TutorialDataService.getCategory()
+        .then((response) => {
+          this.sCategory = response.data.map(this.getDispleyCategory);
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
 
+      console.log(this.sCategory);
+    },
+
+    getDispleyCategory(data) {
+      return {
+        sCategory: data.cat,
+        id: data._id,
+      };
+    },
     getDisplayClass(data) {
       return {
         classID: data._id,
@@ -280,6 +426,7 @@ export default {
   },
   mounted() {
     this.retrieveClass();
+    this.retriveCategory();
   },
 };
 </script>

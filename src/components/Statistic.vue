@@ -355,7 +355,7 @@ export default {
       top += printHtml2;
       window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
 
-      // window.print(); // Вызов метода печати
+      window.print(); // Вызов метода печати
       window.location.reload(); // Страница перезагружается после печати
     },
   },
