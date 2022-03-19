@@ -64,7 +64,7 @@
           </div>
           <div style="margin: 24px 0 0 0">
             Период <b style="color: red">*</b>
-            <input class="form-control" />
+            <input v-model="period" class="form-control" />
           </div>
         </div>
         <div class="flex-food-main">
@@ -90,7 +90,7 @@
           Сумма квитанции: {{ amount }} <br />
         </div>
         <div class="flex-food">
-          <button @click="test()" class="btn btn-success">
+          <button @click="createReciept()" class="btn btn-success">
             Создать квитанцию
           </button>
         </div>
@@ -184,6 +184,7 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      period: "",
       identifier: "",
       date: new Date(), //.toLocaleDateString(),
       chek: false,
@@ -330,6 +331,32 @@ export default {
       console.log(this.file);
     },
 
+    async createReciept() {
+      for (let i = 0; i < this.amount.length; i++) {
+        this.amount[i];
+      }
+      console.log("this.selectedStudentID._id", this.selectedStudentID);
+      var data = {
+        classID: this.selectedClassID.classID,
+        studentID: this.selectedStudentID._id,
+        date: this.date,
+        cat: this.selectedStudentID.Category,
+        amount: this.amount,
+        identifier: this.identifier,
+        period: this.period,
+      };
+
+      console.log(data);
+
+      TutorialDataService.createReciept(data)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+
     test() {
       // this.handleFileUpload();
       const data = new FormData();
@@ -342,13 +369,13 @@ export default {
 
               res.data.files; // binary representation of the file
               res.status; // HTTP status
-            }
+            },
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            }
+            },
         );
       // axios
       //   .post("http://192.168.1.152:8081/single-file", formData, {
@@ -428,6 +455,22 @@ export default {
   mounted() {
     this.retrieveClass();
     this.retriveCategory();
+  },
+  watch: {
+    amount: function () {
+      //this.amount = this.amount.replace(/[^0-9]+/g, "");
+      this.amount = this.amount.replace(/[^\d.]/g, ""); // Удаляем символы, кроме "числа" и "."
+      this.amount = this.amount.replace(/\.{2,}/g, "."); // Сохраняем только первую. Удаляем лишние.
+      this.amount = this.amount
+        .replace(".", "$#$")
+        .replace(/\./g, "")
+        .replace("$#$", ".");
+      //this.amount = this.amount.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3"); // Введите только два десятичных знака
+      if (this.amount.indexOf(".") < 0 && this.amount != "") {
+        // Вышеупомянутое было отфильтровано. Контроль здесь заключается в том, что если нет десятичной точки, первое место не может быть количеством, аналогичным 01, 02
+        this.amount = parseFloat(this.amount);
+      }
+    },
   },
 };
 </script>
