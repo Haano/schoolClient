@@ -46,6 +46,7 @@
             ><input
               type="date"
               v-model="date"
+              id="date"
               required
               v-on:change="changeDate(date)"
               class="form-control"
@@ -93,6 +94,10 @@
           <button @click="createReciept()" class="btn btn-success">
             Создать квитанцию
           </button>
+
+          <button @click="test()" class="btn btn-success">
+            СОтправить файл
+          </button>
         </div>
       </div>
       <br />
@@ -120,9 +125,9 @@
               </td>
               <td>{{ amountFood.amount }}</td>
               <td>{{ amountFood.amount * foodPrice }}</td>
-              <td>{{ amount }}</td>
+              <td>{{ amountGetReciept }}</td>
               <td style="color: red">
-                {{ amount - amountFood.amount * foodPrice }}
+                {{ amountGetReciept - amountFood.amount * foodPrice }}
               </td>
             </tr>
             <tr v-for="item in sCategory" :key="item.message">
@@ -139,8 +144,15 @@
                     {{ selectedStudentID.Category }}</b
                   >
                 </td>
-                <td>{{ amountStudentFood.amount }}</td>
-                <td>{{ amountStudentFood.amount * foodPrice }}</td>
+                <td>{{ selectedStudentID.amount }}</td>
+                <td>{{ selectedStudentID.amount * foodPrice }}</td>
+                <td>{{ selectedStudentID.amountReciept }}</td>
+                <td style="color: red">
+                  {{
+                    selectedStudentID.amountReciept -
+                    selectedStudentID.amount * foodPrice
+                  }}
+                </td>
               </tr>
             </template>
             <template v-if="chek">
@@ -153,6 +165,10 @@
                 </td>
                 <td>{{ item.amount }}</td>
                 <td>{{ item.amount * foodPrice }}</td>
+                <td>{{ item.amountReciept }}</td>
+                <td style="color: red">
+                  {{ item.amount * foodPrice - item.amountReciept }}
+                </td>
               </tr>
             </template>
           </tbody>
@@ -212,80 +228,38 @@ export default {
           identifier: "142124425125125RFS",
           amount: 500,
         },
-        {
-          FirstName: "123",
-          lastName: "123131",
-          date: "13.05.2020 15:33",
-          identifier: "142124125125125RFS",
-          amount: 600,
-        },
-        {
-          FirstName: "123",
-          lastName: "123131",
-          date: "14.05.2020 15:33",
-          identifier: "142124225125125RFS",
-          amount: 2700,
-        },
-        {
-          FirstName: "123",
-          lastName: "123131",
-          date: "15.05.2020 15:33",
-          identifier: "142124325125125RFS",
-          amount: 200,
-        },
-        {
-          FirstName: "123",
-          lastName: "123131",
-          date: "12.05.2020 15:33",
-          identifier: "142124025125125RFS",
-          amount: 200,
-        },
       ],
+      receiptsAll: [],
       selectedClassID: [{ lastName: "" }],
       selectedStudentID: [""],
       amount: 0,
+      amountGetReciept: 0,
       sClass: [],
       Students: [{ FirstName: "TEST" }],
     };
   },
   methods: {
     async changeClass(data) {
+      await this.getReciept(data);
       await this.getStudents(data);
       await this.getMarks(data);
       await this.getAmountCategory();
       this.amountMarksFood();
     },
-    changeStudent(student) {
-      for (let j = 0; j < this.Students.length; j++) {
-        this.Students[j].amount = 0;
-      }
 
+    changeStudent(student) {
       if (student != "Все") {
         this.chek = false;
-        this.amountStudentFood.amount = 0;
-        console.log(student);
-        for (let i = 0; i < this.marks.length; i++) {
-          if (
-            this.marks[i].studentID === student._id &&
-            this.marks[i].causesID === "Питался"
-          ) {
-            this.amountStudentFood.amount += 1;
+        this.receipts = [];
+        for (let i = 0; i < this.receiptsAll.length; i++) {
+          if (this.receiptsAll[i].studentID === student._id) {
+            this.receipts.push(this.receiptsAll[i]);
           }
         }
       } else {
+        this.receipts = this.receiptsAll;
+
         this.chek = true;
-        this.amountStudentFood.amount = 0;
-        console.log(this.Students);
-        for (let i = 0; i < this.marks.length; i++) {
-          for (let j = 0; j < this.Students.length; j++)
-            if (
-              this.marks[i].studentID === this.Students[j]._id &&
-              this.marks[i].causesID === "Питался"
-            ) {
-              this.Students[j].amount += 1;
-            }
-        }
-        console.log("DCT");
       }
     },
 
@@ -297,6 +271,18 @@ export default {
           //this.getMarksToPrint(Object.values(response.data));
           console.log("ответ", response.data);
           this.marks = Object.values(response.data);
+          for (let j = 0; j < this.Students.length; j++) {
+            this.Students[j].amount = 0;
+
+            console.log("ЗАМЕНА", this.Students[j]);
+            for (let i = 0; i < this.marks.length; i++)
+              if (
+                this.marks[i].studentID === this.Students[j]._id &&
+                this.marks[i].causesID === "Питался"
+              ) {
+                this.Students[j].amount += 1;
+              }
+          }
         })
         .catch((e) => {
           console.log(e);
@@ -315,6 +301,39 @@ export default {
           }
         }
       }
+    },
+
+    async getReciept(data) {
+      this.amountGetReciept = 0;
+      if (data) {
+        await TutorialDataService.findReciept(data)
+          .then((response) => {
+            console.log("RECIEPT", response.data);
+            this.receipts.splice(response.data);
+            var a = new Array();
+            a = Object.values(response.data);
+            for (let i = 0; i < a.length; i++) {
+              this.$set(this.receipts, i, a[i]);
+              // this.$set(this.Students[i], amount, 0);
+            }
+            for (let j = 0; j < this.receipts.length; j++) {
+              this.amountGetReciept += this.receipts[j].amount;
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        await TutorialDataService.findReciept()
+          .then((response) => {
+            console.log("RECIEPT", response.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+
+      this.receiptsAll = this.receipts;
     },
 
     amountMarksFood() {
@@ -346,49 +365,40 @@ export default {
         period: this.period,
       };
 
-      console.log(data);
-
       TutorialDataService.createReciept(data)
         .then((response) => {
           console.log(response.data);
+          alert("Квитанция создана", data);
+          window.location.reload();
         })
         .catch((e) => {
+          alert("ОШИБКА, Квитанция не сохранена, повторите попытку позднее");
           console.log(e);
         });
     },
 
-    test() {
-      // this.handleFileUpload();
-      const data = new FormData();
-      data.append("file", this.file);
+    async test() {
+      console.log("ОТПРАВКА", this.file);
+
+      let data = new FormData();
+      data.append("file", this.file, "dasd"); // очень важный data.append ("файл", файл); неудачно
+
+      console.log(data);
+      //await axios.post("192.168.1.152:8080/single-file", data);
+
       TutorialDataService.sendFile(data)
         .then(
           (res) =>
             function () {
-              console.log("SUCCESS!!");
-
-              res.data.files; // binary representation of the file
-              res.status; // HTTP status
-            },
+              console.log("SUCCESS!!", res);
+            }
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            },
+            }
         );
-      // axios
-      //   .post("http://192.168.1.152:8081/single-file", formData, {
-      //     headers: {
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   })
-      //   .then(function () {
-      //     console.log("SUCCESS!!");
-      //   })
-      //   .catch(function () {
-      //     console.log("FAILURE!!");
-      //   });
     },
     getStudents(data) {
       TutorialDataService.findStudentByClassID(data)
@@ -398,7 +408,18 @@ export default {
           a = Object.values(response.data);
           for (var i = 0; i < a.length; i++) {
             a[i].amount = 0;
+            a[i].amountReciept = 0;
+            for (let j = 0; j < this.receipts.length; j++) {
+              if (a[i]._id === this.receipts[j].studentID) {
+                console.log(this.receipts[j].amount, "OOOOO!!!!!!!!", a[i]);
+                a[i].amountReciept =
+                  a[i].amountReciept + this.receipts[j].amount;
+                this.receipts[j].FirstName = a[i].FirstName;
+                this.receipts[j].lastName = a[i].LastName;
+              }
+            }
             this.$set(this.Students, i, a[i]);
+
             // this.$set(this.Students[i], amount, 0);
           }
         })
@@ -413,11 +434,17 @@ export default {
       this.date = value;
     },
 
+    retriveDate() {
+      //поставить текущую дату
+      console.log(document.getElementById("date"), this.date);
+      document.getElementById("date").value = new Date();
+      this.date = new Date().toISOString().slice(0, 10);
+      // this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
+    },
+
     async retrieveClass() {
       //получить список классов
-      for (let i = 0; i < this.receipts.length; i++) {
-        this.amount += this.receipts[i].amount;
-      }
+
       await TutorialDataService.getAllCLass()
         .then((response) => {
           this.sClass = response.data.map(this.getDisplayClass);
@@ -455,6 +482,7 @@ export default {
   mounted() {
     this.retrieveClass();
     this.retriveCategory();
+    this.retriveDate();
   },
   watch: {
     amount: function () {

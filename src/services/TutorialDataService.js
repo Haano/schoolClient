@@ -1,4 +1,5 @@
 import http from "../http-common";
+import httpFile from "../http-common-file";
 
 class TutorialDataService {
   //reciept
@@ -6,6 +7,9 @@ class TutorialDataService {
     return http.post("/createReciept", data);
   }
 
+  findReciept(classID) {
+    return http.post(`/findReciept/id=`, classID);
+  }
   //reciept***
   getAll() {
     return http.get("/tutorials");
@@ -98,7 +102,7 @@ class TutorialDataService {
   }
 
   sendFile(data) {
-    return http.post(`/single-file`, data);
+    return httpFile.post(`/single-file`, data);
   }
 }
 
