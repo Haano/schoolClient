@@ -60,7 +60,7 @@
           <div>
             Сумма квитанции<br />
             (только число) <b style="color: red">*</b>
-            <input class="form-control" v-model="amount" />
+            <input type="number" class="form-control" v-model="amount" />
           </div>
           <div style="margin: 24px 0 0 0">
             Период <b style="color: red">*</b>
