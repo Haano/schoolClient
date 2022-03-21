@@ -253,19 +253,40 @@ export default {
     },
 
     testGET() {
+      let fileURL =
+        "C:/Users/Kerss/Documents/ProjectSchool/server/schoolServer/uploads/6234cd958d9eadf938f025f5/NEWFILEНаправления.docx";
+
+      // var fileURL = window.URL.createObjectURL(
+      //   new Blob([response.data], { type: "application/docx" }),
+      // );
+
       TutorialDataService.getFile()
         .then((response) => {
-          var fileURL = window.URL.createObjectURL(
-            new Blob([response.data], { type: "application/docx" }),
-          );
+          console.log(response.data);
+          var blob = response.data;
+          var contentType = response.data.type; //getResponseHeader("content-type");
+
+          if (window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(
+              new Blob([blob], { type: contentType }),
+              "fileName",
+            );
+          } else {
+            var link = document.createElement("a");
+            document.body.appendChild(link);
+            link.download = "fileName";
+            link.href = window.URL.createObjectURL(blob);
+            link.click();
+            document.body.removeChild(link);
+          }
+
           var fileLink = document.createElement("a");
 
           fileLink.href = fileURL;
-          fileLink.setAttribute("download", "file.docx");
+          fileLink.setAttribute("download", "file");
           document.body.appendChild(fileLink);
 
           fileLink.click();
-          console.log(response.data);
         })
         .catch((e) => {
           console.log(e);

@@ -107,7 +107,10 @@ class TutorialDataService {
     }
 
     getFile() {
-        return http.get(`/loadFileID`);
+        return http.get(`/loadFileID`, {
+            responseType: "blob",
+            observe: "response",
+        });
     }
 }
 
