@@ -61,7 +61,7 @@
           <div>
             Сумма квитанции<br />
             (только число) <b style="color: red">*</b>
-            <input type="number" class="form-control" v-model="amount" />
+            <input type="text" class="form-control" v-model="amount" />
           </div>
           <div style="margin: 24px 0 0 0">
             Период <b style="color: red">*</b>
@@ -98,6 +98,10 @@
           <button @click="test()" class="btn btn-success">
             СОтправить файл
           </button>
+
+          <button @click="testGET()" class="btn btn-primary">
+            Скачать файл
+          </button>
         </div>
       </div>
       <br />
@@ -127,7 +131,7 @@
               <td>{{ amountFood.amount * foodPrice }}</td>
               <td>{{ amountGetReciept }}</td>
               <td style="color: red">
-                {{ amountGetReciept - amountFood.amount * foodPrice }}
+                {{ amountFood.amount * foodPrice - amountGetReciept }}
               </td>
             </tr>
             <tr v-for="item in sCategory" :key="item.message">
@@ -149,8 +153,8 @@
                 <td>{{ selectedStudentID.amountReciept }}</td>
                 <td style="color: red">
                   {{
-                    selectedStudentID.amountReciept -
-                    selectedStudentID.amount * foodPrice
+                    selectedStudentID.amount * foodPrice -
+                    selectedStudentID.amountReciept
                   }}
                 </td>
               </tr>
@@ -196,6 +200,7 @@
 
 <script>
 import TutorialDataService from "../services/TutorialDataService";
+
 //import axios from "axios";
 export default {
   data() {
@@ -245,6 +250,26 @@ export default {
       await this.getMarks(data);
       await this.getAmountCategory();
       this.amountMarksFood();
+    },
+
+    testGET() {
+      TutorialDataService.getFile()
+        .then((response) => {
+          var fileURL = window.URL.createObjectURL(
+            new Blob([response.data], { type: "application/docx" }),
+          );
+          var fileLink = document.createElement("a");
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute("download", "file.docx");
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
 
     changeStudent(student) {
@@ -381,23 +406,23 @@ export default {
       console.log("ОТПРАВКА", this.file);
 
       let data = new FormData();
-      data.append("file", this.file, "dasd"); // очень важный data.append ("файл", файл); неудачно
+      data.append("file", this.file, this.file.name); // очень важный data.append ("файл", файл); неудачно
+      data.append("studentID", this.selectedStudentID._id);
+      console.log(this.selectedStudentID._id);
 
-      console.log(data);
-      //await axios.post("192.168.1.152:8080/single-file", data);
-
+      console.log("ОТПРАВКА", data);
       TutorialDataService.sendFile(data)
         .then(
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            }
+            },
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            }
+            },
         );
     },
     getStudents(data) {
