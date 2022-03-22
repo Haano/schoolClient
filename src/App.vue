@@ -2,9 +2,12 @@
   <v-app>
     <navbar
       class="navbar navbar-expand-lg navbar-light"
-      style="background-color: #e3f2fd border: 1px solid grey;"
+      style="background-color: #e3f2fd border: 1px solid grey;padding: -10px -20px 0px 0px;"
     >
-      <div class="d-flex align-center mr-2">Отсутствующие</div>
+      <div style="text-align: center; font-weight: bold; font-size: 16px">
+        CTA
+        <div style="font-size: 12px">class teacher assistant</div>
+      </div>
       <v-btn to="/" text> ГЛАВНАЯ </v-btn>
       <!-- <v-btn to="/class" text> Классы </v-btn> -->
       <!-- <v-btn to="/CreateStudent" text> Ученики </v-btn> -->

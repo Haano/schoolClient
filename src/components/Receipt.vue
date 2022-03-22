@@ -95,8 +95,12 @@
             Создать квитанцию
           </button>
 
-          <button @click="test()" class="btn btn-success">
-            СОтправить файл
+          <button
+            @click="sendFileToServer()"
+            class="btn btn-success"
+            style="margin: 1px 1px 1px 1px"
+          >
+            Отправить файл
           </button>
 
           <button @click="testGET()" class="btn btn-primary">
@@ -141,7 +145,7 @@
             </tr>
             <template v-if="!chek">
               <tr>
-                <td style="width: 200px">
+                <td style="width: 180px">
                   <b
                     >{{ selectedStudentID.FirstName }}
                     {{ selectedStudentID.LastName }}
@@ -187,9 +191,7 @@
       :hide-default-footer="true"
     >
       <template v-slot:[`item.actions`]="{ item }">
-        <button class="btn btn-primary" @click="deleteStudent(item._id)">
-          Скачать
-        </button>
+        <button class="btn btn-primary" @click="testGET(item)">Скачать</button>
         <button class="btn btn-danger" @click="deleteStudent(item._id)">
           Удалить
         </button>
@@ -219,7 +221,7 @@ export default {
       headers: [
         { text: "Фамилия", value: "FirstName" },
         { text: "Имя", value: "lastName" },
-        { text: "Дата", value: "date" },
+        { text: "Дата", value: "datePrint" },
         { text: "ID", value: "identifier" },
         { text: "Период", value: "period" },
         { text: "Сумма", value: "amount" },
@@ -252,15 +254,16 @@ export default {
       this.amountMarksFood();
     },
 
-    testGET() {
-      let fileURL =
-        "C:/Users/Kerss/Documents/ProjectSchool/server/schoolServer/uploads/6234cd958d9eadf938f025f5/NEWFILEНаправления.docx";
+    testGET(data) {
+      let dataFile = {
+        classID: data.classID,
+        studentID: data.studentID,
+        date: data.date,
+        id: data.identifier,
+      };
 
-      // var fileURL = window.URL.createObjectURL(
-      //   new Blob([response.data], { type: "application/docx" }),
-      // );
-
-      TutorialDataService.getFile()
+      console.log(data, dataFile);
+      TutorialDataService.getFile(dataFile)
         .then((response) => {
           console.log(response.data);
           var blob = response.data;
@@ -269,7 +272,7 @@ export default {
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName",
+              "fileName"
             );
           } else {
             var link = document.createElement("a");
@@ -279,14 +282,6 @@ export default {
             link.click();
             document.body.removeChild(link);
           }
-
-          var fileLink = document.createElement("a");
-
-          fileLink.href = fileURL;
-          fileLink.setAttribute("download", "file");
-          document.body.appendChild(fileLink);
-
-          fileLink.click();
         })
         .catch((e) => {
           console.log(e);
@@ -359,6 +354,10 @@ export default {
             var a = new Array();
             a = Object.values(response.data);
             for (let i = 0; i < a.length; i++) {
+              a[i].datePrint = new Date(a[i].date);
+              console.log("RECIEPT", a[i]);
+              a[i].datePrint = a[i].datePrint.toLocaleDateString();
+              console.log("RECIEPT", a[i]);
               this.$set(this.receipts, i, a[i]);
               // this.$set(this.Students[i], amount, 0);
             }
@@ -401,16 +400,33 @@ export default {
         this.amount[i];
       }
       console.log("this.selectedStudentID._id", this.selectedStudentID);
-      var data = {
-        classID: this.selectedClassID.classID,
-        studentID: this.selectedStudentID._id,
-        date: this.date,
-        cat: this.selectedStudentID.Category,
-        amount: this.amount,
-        identifier: this.identifier,
-        period: this.period,
-      };
+      if (this.file) {
+        var data = {
+          classID: this.selectedClassID.classID,
+          studentID: this.selectedStudentID._id,
+          date: this.date,
+          cat: this.selectedStudentID.Category,
+          amount: this.amount,
+          identifier: this.identifier,
+          period: this.period,
+          fileName: this.file.name,
+        };
+      } else {
+        data = {
+          classID: this.selectedClassID.classID,
+          studentID: this.selectedStudentID._id,
+          date: this.date,
+          cat: this.selectedStudentID.Category,
+          amount: this.amount,
+          identifier: this.identifier,
+          period: this.period,
+          fileName: "NON",
+        };
+      }
 
+      if (this.file) {
+        await this.sendFileToServer();
+      }
       TutorialDataService.createReciept(data)
         .then((response) => {
           console.log(response.data);
@@ -423,13 +439,14 @@ export default {
         });
     },
 
-    async test() {
+    async sendFileToServer() {
       console.log("ОТПРАВКА", this.file);
 
       let data = new FormData();
       data.append("file", this.file, this.file.name); // очень важный data.append ("файл", файл); неудачно
       data.append("studentID", this.selectedStudentID._id);
-      console.log(this.selectedStudentID._id);
+      data.append("date", this.date);
+      data.append("id", this.identifier);
 
       console.log("ОТПРАВКА", data);
       TutorialDataService.sendFile(data)
@@ -437,13 +454,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            },
+            }
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            },
+            }
         );
     },
     getStudents(data) {
