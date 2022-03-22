@@ -5,8 +5,8 @@
       style="background-color: #e3f2fd border: 1px solid grey;padding: -10px -20px 0px 0px;"
     >
       <div style="text-align: center; font-weight: bold; font-size: 16px">
-        CTA
-        <div style="font-size: 12px">class teacher assistant</div>
+        ACT
+        <div style="font-size: 12px">assistant class teacher</div>
       </div>
       <v-btn to="/" text> ГЛАВНАЯ </v-btn>
       <!-- <v-btn to="/class" text> Классы </v-btn> -->

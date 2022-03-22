@@ -94,18 +94,6 @@
           <button @click="createReciept()" class="btn btn-success">
             Создать квитанцию
           </button>
-
-          <button
-            @click="sendFileToServer()"
-            class="btn btn-success"
-            style="margin: 1px 1px 1px 1px"
-          >
-            Отправить файл
-          </button>
-
-          <button @click="testGET()" class="btn btn-primary">
-            Скачать файл
-          </button>
         </div>
       </div>
       <br />
@@ -191,8 +179,19 @@
       :hide-default-footer="true"
     >
       <template v-slot:[`item.actions`]="{ item }">
-        <button class="btn btn-primary" @click="testGET(item)">Скачать</button>
-        <button class="btn btn-danger" @click="deleteStudent(item._id)">
+        <button
+          class="btn btn-primary"
+          style="padding-right: 20px; margin-right: 20px"
+          @click="testGET(item)"
+        >
+          Скачать
+        </button>
+
+        <button
+          class="btn btn-danger"
+          style="padding: -20px -20px -20px -20px"
+          @click="deleteReciept(item)"
+        >
           Удалить
         </button>
       </template>
@@ -253,6 +252,17 @@ export default {
       await this.getAmountCategory();
       this.amountMarksFood();
     },
+    deleteReciept(data) {
+      console.log(data);
+      let text =
+        "Вы действительно хотите удалить квитанцию на сумму " +
+        data.amount +
+        " рублей с ID " +
+        data.identifier;
+      var isAdmin = confirm(text);
+
+      alert(isAdmin);
+    },
 
     testGET(data) {
       let dataFile = {
@@ -260,30 +270,33 @@ export default {
         studentID: data.studentID,
         date: data.date,
         id: data.identifier,
+        className: this.selectedClassID.className,
       };
 
       console.log(data, dataFile);
       TutorialDataService.getFile(dataFile)
         .then((response) => {
-          console.log(response.data);
+          console.log(response);
           var blob = response.data;
           var contentType = response.data.type; //getResponseHeader("content-type");
 
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName"
+              "fileName",
             );
           } else {
             var link = document.createElement("a");
             document.body.appendChild(link);
-            link.download = "fileName";
+            link.download =
+              data.FirstName + "_" + data.amount + "_" + data.fileName; //data.amount + "_" + response.data.fileName;
             link.href = window.URL.createObjectURL(blob);
             link.click();
             document.body.removeChild(link);
           }
         })
         .catch((e) => {
+          alert("Файла не найдено");
           console.log(e);
         });
     },
@@ -423,7 +436,6 @@ export default {
           fileName: "NON",
         };
       }
-
       if (this.file) {
         await this.sendFileToServer();
       }
@@ -431,10 +443,13 @@ export default {
         .then((response) => {
           console.log(response.data);
           alert("Квитанция создана", data);
+
           window.location.reload();
         })
         .catch((e) => {
-          alert("ОШИБКА, Квитанция не сохранена, повторите попытку позднее");
+          alert(
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
+          );
           console.log(e);
         });
     },
@@ -447,6 +462,8 @@ export default {
       data.append("studentID", this.selectedStudentID._id);
       data.append("date", this.date);
       data.append("id", this.identifier);
+      data.append("classID", this.selectedClassID.classID);
+      data.append("className", this.selectedClassID.className);
 
       console.log("ОТПРАВКА", data);
       TutorialDataService.sendFile(data)
@@ -454,13 +471,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            }
+            },
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            }
+            },
         );
     },
     getStudents(data) {
@@ -550,13 +567,16 @@ export default {
   watch: {
     amount: function () {
       //this.amount = this.amount.replace(/[^0-9]+/g, "");
-      this.amount = this.amount.replace(/[^\d.]/g, ""); // Удаляем символы, кроме "числа" и "."
-      this.amount = this.amount.replace(/\.{2,}/g, "."); // Сохраняем только первую. Удаляем лишние.
+      this.amount = this.amount.toString().replace(/[^\d.]/g, ""); // Удаляем символы, кроме "числа" и "."
+      this.amount = this.amount.toString().replace(/\.{2,}/g, "."); // Сохраняем только первую. Удаляем лишние.
       this.amount = this.amount
+        .toString()
         .replace(".", "$#$")
         .replace(/\./g, "")
         .replace("$#$", ".");
-      //this.amount = this.amount.replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3"); // Введите только два десятичных знака
+      // this.amount = this.amount
+      // .toString()
+      // .replace(/^(\-)*(\d+)\.(\d\d).*$/, "$1$2.$3"); // Введите только два десятичных знака
       if (this.amount.indexOf(".") < 0 && this.amount != "") {
         // Вышеупомянутое было отфильтровано. Контроль здесь заключается в том, что если нет десятичной точки, первое место не может быть количеством, аналогичным 01, 02
         this.amount = parseFloat(this.amount);
