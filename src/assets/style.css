@@ -127,9 +127,8 @@ navbar {
 
 .flex-food-main {
   display: flex;
-  flex-direction: baseline;
-  justify-content: center;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .flex-food {
@@ -141,17 +140,25 @@ navbar {
 }
 .flex-food > div {
   justify-content: center;
-  flex-direction: row;
+  flex-direction: inherit;
   align-items: center;
-  width: 250px;
+  width: 300px;
   padding: 0px 5px 2px;
   flex-wrap: wrap;
 }
-.flex-food-main > span {
-  max-width: 90%;
-  margin-left: 20px;
-  padding-left: 20px;
+.reciept-table {
+  /* margin-left: 5px;
+  padding-left: 5px; */
   border-left-color: #b4b4b4; /* Цвет линии слева */
   border-left-style: dotted; /* Стиль линии */
   border-left-width: 3px; /* Толщина линии */
+}
+
+.reciept-table TD,
+TH {
+  padding: 2px; /* Поля вокруг содержимого таблицы */
+  border: 0.2px solid black; /* Параметры рамки */
+}
+.reciept-table TH {
+  background: #b0e0e6; /* Цвет фона */
 }

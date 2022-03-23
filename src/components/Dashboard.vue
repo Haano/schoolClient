@@ -82,6 +82,9 @@
           :items-per-page="50"
           hide-default-footer
         >
+          <template v-slot:[`item.index`]="{ index }">
+            {{ index + 1 }}
+          </template>
           <template v-slot:[`item.date`]="{ item }">
             <div class="select-flex">
               <div class="select">
@@ -142,6 +145,11 @@ export default {
       causes: [{ id: "1", causes: "-", count: 0 }],
       title: "",
       headers: [
+        {
+          value: "index",
+          text: "#",
+          width: "30px",
+        },
         {
           text: "Фамилия",
           value: "FirstName",

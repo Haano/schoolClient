@@ -26,6 +26,18 @@
         </div>
       </div>
       <div class="cat">
+        <select
+          name=""
+          v-model="globalOption"
+          class="form-select"
+          id=""
+          @change="changeGlobalOption(globalOption)"
+        >
+          <option>Отсутствующие</option>
+          <option>Питание</option>
+          <option>Питание 1 смена</option>
+          <option>Питание 2 смена</option>
+        </select>
         <div class="cat-item">
           <input
             type="date"
@@ -75,18 +87,33 @@
       </ul>
     </div>
 
-    <div class="myTable" id="table">
-      <v-col>
-        <v-data-table
-          :headers="headers"
-          :items="this.marksPrint"
-          :items-per-page="3000"
-          hide-default-footer
-        >
-        </v-data-table>
-      </v-col>
+    <div v-if="globalOption === 'Отсутствующие'">
+      <div class="myTable" id="table">
+        <v-col>
+          <v-data-table
+            :headers="headers"
+            :items="this.marksPrint"
+            :items-per-page="3000"
+            hide-default-footer
+          >
+          </v-data-table>
+        </v-col>
+      </div>
     </div>
 
+    <div v-if="globalOption === 'Питание'">
+      <div class="myTable" id="table">
+        <v-col>
+          <v-data-table
+            :headers="headersEat"
+            :items="this.classList"
+            :items-per-page="3000"
+            hide-default-footer
+          >
+          </v-data-table>
+        </v-col>
+      </div>
+    </div>
     <button @click="help()" class="btn btn-success">Помощь</button>
   </div>
 </template>
@@ -96,6 +123,8 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      sCategory: [],
+      globalOption: [],
       headers: [
         {
           text: "Класс",
@@ -121,6 +150,13 @@ export default {
           text: "Причина",
           value: "causesID",
           sortable: false,
+        },
+      ],
+      headersEat: [
+        {
+          text: "Класс",
+          value: "className",
+          sortable: true,
         },
       ],
       marks: [],
@@ -332,6 +368,7 @@ export default {
         className: data.className,
         shift: data.shift,
         change: false,
+        count: 0,
       };
     },
 
@@ -357,6 +394,88 @@ export default {
 
       window.print(); // Вызов метода печати
       window.location.reload(); // Страница перезагружается после печати
+    },
+
+    async changeGlobalOption(globalOption) {
+      let classListAll = [];
+
+      this.$set(this.headersEat, 1, {
+        text: "Всего",
+        value: "count",
+        width: "40%",
+        sortable: false,
+      });
+      for (let i = 0; i < this.sCategory.length; i++) {
+        console.log(this.sCategory[i]);
+        this.$set(this.headersEat, i + 2, {
+          text: this.sCategory[i].sCategory,
+          value: this.sCategory.sCategory,
+          width: "40%",
+          sortable: false,
+        });
+      }
+      if (globalOption === "Питание") {
+        for (let j = 0; j < this.classList.length; j++) {
+          classListAll.push(this.classList[j]);
+        }
+      }
+      if (globalOption === "Питание 1 смена") {
+        console.log(this.classList);
+        for (let j = 0; j < this.classList.length; j++) {
+          console.log(this.classList[j]);
+          if (this.classList[j].shift === "1 смена") {
+            console.log("1 смена");
+            classListAll.push(this.classList[j]);
+          }
+        }
+      }
+      if (globalOption === "Питание 2 смена") {
+        for (let j = 0; j < this.classList.length; j++) {
+          if (this.classList[j].shift === "2 смена")
+            classListAll.push(this.classList[j]);
+        }
+      }
+
+      await this.getAllCategory();
+
+      for (let j = 0; j < classListAll.length; j++) {
+        this.$set(classListAll[j], "count", 0);
+      }
+      if (classListAll[classListAll.length - 1].className != "Итого")
+        classListAll.push({ className: "Итого", count: 0 });
+
+      for (let y = 0; y < this.marks.length; y++) {
+        for (let j = 0; j < classListAll.length - 1; j++) {
+          if (
+            this.marks[y].causesID === "Питался" &&
+            this.marks[y].classID === classListAll[j].classID
+          ) {
+            this.$set(classListAll[j], "count", classListAll[j].count + 1);
+          }
+
+          let temp = 0;
+          for (let j = 0; j < classListAll.length - 1; j++) {
+            temp = temp + classListAll[j].count;
+          }
+          this.$set(classListAll[classListAll.length - 1], "count", temp);
+        }
+      }
+    },
+    async getAllCategory() {
+      await TutorialDataService.getCategory()
+        .then((response) => {
+          this.sCategory = response.data.map(this.getDispleyCategory);
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getDispleyCategory(data) {
+      return {
+        sCategory: data.cat,
+        id: data._id,
+      };
     },
   },
   mounted() {

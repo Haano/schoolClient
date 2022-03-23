@@ -6,7 +6,7 @@
       <div>
         <div class="flex-food">
           <div>
-            Класс
+            <b> Класс</b><b style="color: red">*</b>
             <select
               class="form-select"
               v-model="selectedClassID"
@@ -23,7 +23,7 @@
           </div>
 
           <div>
-            Ученик
+            <b> Ученик </b><b style="color: red">*</b>
             <select
               class="form-select"
               v-model="selectedStudentID"
@@ -42,7 +42,7 @@
         </div>
         <div class="flex-food">
           <div>
-            Дата оплаты <b style="color: red">*</b
+            <b> Дата оплаты </b> <b style="color: red">*</b
             ><input
               type="date"
               v-model="date"
@@ -53,26 +53,28 @@
             />
           </div>
           <div>
-            Идентификатор (СУИП) <b style="color: red">*</b
+            <b> Идентификатор (СУИП) </b><b style="color: red">*</b
             ><input class="form-control" v-model="identifier" />
           </div>
         </div>
         <div class="flex-food">
           <div>
-            Сумма квитанции<br />
-            (только число) <b style="color: red">*</b>
+            <b
+              >Сумма квитанции<br />
+              (только число)
+            </b>
+            <b style="color: red">*</b>
             <input type="text" class="form-control" v-model="amount" />
           </div>
           <div style="margin: 24px 0 0 0">
-            Период <b style="color: red">*</b>
+            <b>Период </b> <b style="color: red">*</b>
             <input v-model="period" class="form-control" />
           </div>
         </div>
-        <div class="flex-food-main">
+        <div class="flex-food">
           <div>
             <div>
-              Можно загрузить<br />
-              файл квитанции
+              <b>Загрузите файл квитанции </b> <b style="color: red">*</b>
             </div>
             <input
               type="file"
@@ -85,29 +87,53 @@
             <br />
           </div>
         </div>
-        <div class="flex-food">
-          Дата: {{ new Date(date).toLocaleDateString() }} <br />
-          ID: {{ identifier }} <br />
-          Сумма квитанции: {{ amount }} <br />
+        <div>
+          <b>Ученик: </b>{{ selectedStudentID.FirstName }}
+          {{ selectedStudentID.LastName }}
+          <br />
+          <b> Дата: </b>{{ new Date(date).toLocaleDateString() }} <br />
+          <b> ID:</b> {{ identifier }} <br />
+          <b> Сумма квитанции:</b> {{ amount }} <br />
+          <b> Период:</b> {{ period }} <br />
+          <b> Файл:</b> {{ file.name }} <br />
         </div>
-        <div class="flex-food">
-          <button @click="createReciept()" class="btn btn-success">
+        <div
+          v-if="
+            amount != 0 &&
+            identifier &&
+            selectedStudentID != 'Все' &&
+            selectedStudentID != '' &&
+            period != '' &&
+            file != ''
+          "
+          class="flex-food"
+        >
+          <button
+            @click="createReciept()"
+            id="createReciept"
+            class="btn btn-success"
+          >
             Создать квитанцию
           </button>
         </div>
+        <div v-else class="flex-food">
+          <button class="btn btn-success" disabled="true">
+            Заполните все поля для создания квитацнии
+          </button>
+        </div>
       </div>
-      <br />
-      <span>
+
+      <div>
         Расчет по стоимости порции:
         <input type="text" class="form-control" v-model="foodPrice" />
         <br />
-        <table class="table table-bordered">
+        <table class="reciept-table">
           <caption>
             Сводка по питанию
           </caption>
           <thead>
             <tr>
-              <th scope="col" style="width: 100px"></th>
+              <th scope="col" style="width: 100px">Имя</th>
               <th scope="col">Всего питались</th>
               <th scope="col">Стоимость</th>
               <th scope="col">Денег сдано</th>
@@ -122,7 +148,16 @@
               <td>{{ amountFood.amount }}</td>
               <td>{{ amountFood.amount * foodPrice }}</td>
               <td>{{ amountGetReciept }}</td>
-              <td style="color: red">
+
+              <td
+                v-if="amountFood.amount * foodPrice - amountGetReciept"
+                :class="{
+                  'color-red':
+                    amountFood.amount * foodPrice - amountGetReciept > 0,
+                  'color-green':
+                    amountFood.amount * foodPrice - amountGetReciept <= 0,
+                }"
+              >
                 {{ amountFood.amount * foodPrice - amountGetReciept }}
               </td>
             </tr>
@@ -130,6 +165,8 @@
               <td>{{ item.sCategory }}</td>
               <td>{{ item.count }}</td>
               <td>{{ item.count * foodPrice }}</td>
+              <td></td>
+              <td></td>
             </tr>
             <template v-if="!chek">
               <tr>
@@ -162,14 +199,23 @@
                 <td>{{ item.amount }}</td>
                 <td>{{ item.amount * foodPrice }}</td>
                 <td>{{ item.amountReciept }}</td>
-                <td style="color: red">
+                <td
+                  v-if="item.amount * foodPrice - item.amountReciept <= 0"
+                  style="color: green"
+                >
+                  {{ item.amount * foodPrice - item.amountReciept }}
+                </td>
+                <td
+                  v-if="item.amount * foodPrice - item.amountReciept > 0"
+                  style="color: red"
+                >
                   {{ item.amount * foodPrice - item.amountReciept }}
                 </td>
               </tr>
             </template>
           </tbody>
         </table>
-      </span>
+      </div>
     </div>
     <br />
     <v-data-table
@@ -177,6 +223,7 @@
       :items="receipts"
       disable-pagination
       :hide-default-footer="true"
+      :loading="loading"
     >
       <template v-slot:[`item.actions`]="{ item }">
         <button
@@ -206,12 +253,13 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      loading: false,
       period: "",
       identifier: "",
       date: new Date(), //.toLocaleDateString(),
       chek: false,
       sCategory: [],
-      foodPrice: 25,
+      foodPrice: 75,
       marks: [],
       amountFood: { amount: 0 },
       amountStudentFood: { amount: 0 },
@@ -226,31 +274,25 @@ export default {
         { text: "Сумма", value: "amount" },
         { text: "Действия", value: "actions", sortable: false },
       ],
-      receipts: [
-        {
-          FirstName: "123",
-          lastName: "123131",
-          date: "12.05.2020 15:33",
-          identifier: "142124425125125RFS",
-          amount: 500,
-        },
-      ],
+      receipts: [],
       receiptsAll: [],
       selectedClassID: [{ lastName: "" }],
       selectedStudentID: [""],
       amount: 0,
       amountGetReciept: 0,
       sClass: [],
-      Students: [{ FirstName: "TEST" }],
+      Students: [],
     };
   },
   methods: {
     async changeClass(data) {
+      this.loading = true;
       await this.getReciept(data);
       await this.getStudents(data);
       await this.getMarks(data);
       await this.getAmountCategory();
       this.amountMarksFood();
+      this.loading = false;
     },
     deleteReciept(data) {
       console.log(data);
@@ -283,7 +325,7 @@ export default {
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName",
+              "fileName"
             );
           } else {
             var link = document.createElement("a");
@@ -302,6 +344,7 @@ export default {
     },
 
     changeStudent(student) {
+      this.loading = true;
       if (student != "Все") {
         this.chek = false;
         this.receipts = [];
@@ -310,11 +353,14 @@ export default {
             this.receipts.push(this.receiptsAll[i]);
           }
         }
+        // document.getElementById("createReciept").disabled = false;
       } else {
         this.receipts = this.receiptsAll;
 
         this.chek = true;
+        // document.getElementById("createReciept").disabled = true;
       }
+      this.loading = false;
     },
 
     async getMarks(ID) {
@@ -350,7 +396,10 @@ export default {
       console.log("!!!!!", this.marks, this.sCategory);
       for (let i = 0; i < this.marks.length; i++) {
         for (let j = 0; j < this.sCategory.length; j++) {
-          if (this.marks[i].cat === this.sCategory[j].sCategory) {
+          if (
+            this.marks[i].cat === this.sCategory[j].sCategory &&
+            this.marks[i].causesID === "Питался"
+          ) {
             this.sCategory[j].count += 1;
           }
         }
@@ -448,7 +497,7 @@ export default {
         })
         .catch((e) => {
           alert(
-            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует."
           );
           console.log(e);
         });
@@ -471,13 +520,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            },
+            }
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            },
+            }
         );
     },
     getStudents(data) {
@@ -588,4 +637,12 @@ export default {
 
 <style>
 @import "../assets/style.css";
+
+.color-green {
+  color: green;
+}
+
+.color-red {
+  color: red;
+}
 </style>
