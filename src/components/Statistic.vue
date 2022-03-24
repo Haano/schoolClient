@@ -88,30 +88,39 @@
     </div>
 
     <div v-if="globalOption === 'Отсутствующие'">
-      <div class="myTable" id="table">
+      <div class="myTable">
         <v-col>
           <v-data-table
             :headers="headers"
             :items="this.marksPrint"
             :items-per-page="3000"
             hide-default-footer
+            id="table"
           >
           </v-data-table>
         </v-col>
       </div>
     </div>
 
-    <div v-if="globalOption === 'Питание'">
-      <div class="myTable" id="table">
-        <v-col>
-          <v-data-table
-            :headers="headersEat"
-            :items="this.classList"
-            :items-per-page="3000"
-            hide-default-footer
-          >
-          </v-data-table>
-        </v-col>
+    <div
+      v-if="
+        globalOption === 'Питание' ||
+        globalOption === 'Питание 1 смена' ||
+        globalOption === 'Питание 2 смена'
+      "
+      class="myTable"
+    >
+      <!-- fixed-header
+        height="40vh" -->
+      <div class="myTable">
+        <v-data-table
+          :headers="headersEat"
+          :items="this.classListAll"
+          :items-per-page="3000"
+          hide-default-footer
+          id="table"
+        >
+        </v-data-table>
       </div>
     </div>
     <button @click="help()" class="btn btn-success">Помощь</button>
@@ -157,12 +166,14 @@ export default {
           text: "Класс",
           value: "className",
           sortable: true,
+          style: "",
         },
       ],
       marks: [],
       marksPrint: [],
       sDates: [],
       classList: [],
+      classListAll: [],
       studentsList: [{ FirstName: "1", LastName: "2" }],
       countAll: [{ causes: "21231" }],
       activeClassOK: "class-mark-item-ok",
@@ -180,6 +191,7 @@ export default {
       await this.findAllStudents(); // получить всех учеников (students)
       await this.defineTileColorClass(); //покрасить плитки в нужный цвет
       await this.countStat();
+      this.changeGlobalOption(this.globalOption);
       //посчитать данные
     },
 
@@ -383,83 +395,149 @@ export default {
       //
       //$("# dataReportBox").prepend(topdiv); // Вставляем вновь созданный узел div в верхнюю часть содержимого контейнера dataReportBox
       let data = this.sDates.date;
-      // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
-      let top = "<h1> МБОУ СОШ №24</h1> <h2>Отсутствующие на " + data + "</h2>";
-      let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
-      let printHtml2 = document.getElementById("ul-stat").innerHTML;
+      if (this.globalOption === "Отсутвующие") {
+        // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
+        let top =
+          "<h2> МБОУ СОШ №24</h2> <h3>Отсутствующие на " + data + "</h3>";
+        let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
+        let printHtml2 = document.getElementById("ul-stat").innerHTML;
 
-      printHtml2 += printHtml;
-      top += printHtml2;
-      window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
+        printHtml2 += printHtml;
+        top += printHtml2;
+        window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
 
-      window.print(); // Вызов метода печати
-      window.location.reload(); // Страница перезагружается после печати
+        window.print(); // Вызов метода печати
+        window.location.reload(); // Страница перезагружается после печати
+      } else {
+        // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
+        let top = "<h2> МБОУ СОШ №24</h2> <h3>Питание на " + data + "</h3>";
+        let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
+        let printHtml2 = document.getElementById("ul-stat").innerHTML;
+
+        printHtml2 += printHtml;
+        top += printHtml2;
+        window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
+
+        window.print(); // Вызов метода печати
+        window.location.reload(); // Страница перезагружается после печати
+      }
     },
 
     async changeGlobalOption(globalOption) {
-      let classListAll = [];
+      //clear class print
+      this.classListAll = [];
+      let arrayCat = [];
 
+      //добавить столбец в таблицу (всего)
       this.$set(this.headersEat, 1, {
         text: "Всего",
         value: "count",
-        width: "40%",
+        width: "100px",
         sortable: false,
       });
+
+      //получить категории
+      await this.getAllCategory();
+      //добавить столбцы категорий
+      //let textValue = "";
       for (let i = 0; i < this.sCategory.length; i++) {
         console.log(this.sCategory[i]);
+        // textValue = "" + this.sCategory[i].id;
         this.$set(this.headersEat, i + 2, {
           text: this.sCategory[i].sCategory,
-          value: this.sCategory.sCategory,
-          width: "40%",
+          value: this.sCategory[i].id,
+          width: "100px",
           sortable: false,
         });
       }
+
+      //сформировать список классов согласно выбору
       if (globalOption === "Питание") {
         for (let j = 0; j < this.classList.length; j++) {
-          classListAll.push(this.classList[j]);
+          this.classListAll.push(this.classList[j]);
         }
       }
       if (globalOption === "Питание 1 смена") {
-        console.log(this.classList);
         for (let j = 0; j < this.classList.length; j++) {
-          console.log(this.classList[j]);
           if (this.classList[j].shift === "1 смена") {
             console.log("1 смена");
-            classListAll.push(this.classList[j]);
+            this.classListAll.push(this.classList[j]);
           }
         }
+        console.log("1 смена", this.classListAll);
       }
       if (globalOption === "Питание 2 смена") {
         for (let j = 0; j < this.classList.length; j++) {
           if (this.classList[j].shift === "2 смена")
-            classListAll.push(this.classList[j]);
+            this.classListAll.push(this.classList[j]);
         }
       }
 
-      await this.getAllCategory();
-
-      for (let j = 0; j < classListAll.length; j++) {
-        this.$set(classListAll[j], "count", 0);
+      //добавить в переменную чистый параметр для подсчета общей суммы
+      for (let j = 0; j < this.classListAll.length; j++) {
+        this.$set(this.classListAll[j], "count", 0);
+        for (let i = 0; i < this.sCategory.length; i++) {
+          this.$set(this.classListAll[j], this.sCategory[i].id, 0);
+          arrayCat[i] = 0;
+        }
       }
-      if (classListAll[classListAll.length - 1].className != "Итого")
-        classListAll.push({ className: "Итого", count: 0 });
 
-      for (let y = 0; y < this.marks.length; y++) {
-        for (let j = 0; j < classListAll.length - 1; j++) {
+      //добавить последнюю строку с ИТОГО
+      if (this.classListAll[this.classListAll.length - 1].className != "Итого")
+        this.classListAll.push({ className: "Итого", count: 0 });
+
+      //посчитать количество питающихся для классов всего + cat
+      let temp = 0;
+      for (let j = 0; j < this.classListAll.length - 1; j++) {
+        for (let i = 0; i < this.sCategory.length; i++) {
+          arrayCat[i] = 0;
+        }
+        for (let y = 0; y < this.marks.length; y++) {
           if (
             this.marks[y].causesID === "Питался" &&
-            this.marks[y].classID === classListAll[j].classID
+            this.marks[y].classID === this.classListAll[j].classID
           ) {
-            this.$set(classListAll[j], "count", classListAll[j].count + 1);
-          }
+            this.$set(
+              this.classListAll[j],
+              "count",
+              this.classListAll[j].count + 1
+            );
 
-          let temp = 0;
-          for (let j = 0; j < classListAll.length - 1; j++) {
-            temp = temp + classListAll[j].count;
+            // let countCat = this.sCategory[i].sCategory;
+            for (let i = 0; i < this.sCategory.length; i++) {
+              if (this.marks[y].cat === this.sCategory[i].sCategory) {
+                arrayCat[i] = arrayCat[i] + 1;
+
+                this.$set(
+                  this.classListAll[j],
+                  this.sCategory[i].id,
+                  arrayCat[i]
+                );
+                this.$set(
+                  this.sCategory[i],
+                  "count",
+                  this.sCategory[i].count + 1
+                );
+                console.log("СЛОЖИЛ", this.sCategory[i]);
+              }
+            }
+            temp += 1;
           }
-          this.$set(classListAll[classListAll.length - 1], "count", temp);
         }
       }
+
+      this.$set(this.classListAll[this.classListAll.length - 1], "count", temp);
+
+      for (let i = 0; i < this.sCategory.length; i++) {
+        console.log(this.sCategory[i].count);
+        this.$set(
+          this.classListAll[this.classListAll.length - 1],
+          this.sCategory[i].id,
+          this.sCategory[i].count
+        );
+      }
+
+      console.log(this.sCategory);
     },
     async getAllCategory() {
       await TutorialDataService.getCategory()
@@ -475,6 +553,7 @@ export default {
       return {
         sCategory: data.cat,
         id: data._id,
+        count: 0,
       };
     },
   },
