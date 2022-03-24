@@ -70,7 +70,7 @@
     </div>
 
     <div>
-      <ul class="ul-stat" id="ul-stat">
+      <ul id="ul-stat">
         <li>
           Всего учеников:
           <b style="padding: 0 5px 0 5px">
@@ -82,7 +82,9 @@
         <li>Данные отправлены на: {{ marks.length }}</li>
         <li>Отсутствует: {{ marksPrint.length }}</li>
         <li v-for="caus in countAll" :key="caus.causes">
-          {{ caus.causes }} = {{ caus.count }}
+          {{ caus.causes }} = {{ caus.count }} ({{
+            reversedMessage(caus.count)
+          }}%)
         </li>
       </ul>
     </div>
@@ -556,10 +558,25 @@ export default {
         count: 0,
       };
     },
+
+    reversedMessage: function (data) {
+      let a = (data / this.studentsList.length) * 100;
+      console.log(a);
+      // `this` указывает на экземпляр vm
+      return a.toFixed(2);
+    },
   },
   mounted() {
     this.initialization();
     this.retrieveData();
+  },
+  computed: {
+    // геттер вычисляемого значения
+    // reversedMessage: function (data) {
+    //   let a = (data.count / this.studentsList.length) * 100;
+    //   // `this` указывает на экземпляр vm
+    //   return a.slice(2, 2);
+    // },
   },
 };
 </script>
