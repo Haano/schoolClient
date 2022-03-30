@@ -2,116 +2,120 @@ import http from "../http-common";
 import httpFile from "../http-common-file";
 
 class TutorialDataService {
-  //reciept
-  createReciept(data) {
-    return http.post("/createReciept", data);
-  }
+    //reciept
+    createReciept(data) {
+        return http.post("/createReciept", data);
+    }
 
-  findReciept(classID) {
-    return http.post(`/findReciept/id=`, classID);
-  }
-  //reciept***
-  getAll() {
-    return http.get("/tutorials");
-  }
+    findReciept(classID) {
+        return http.post(`/findReciept/id=`, classID);
+    }
 
-  get(id) {
-    return http.get(`/tutorials/${id}`);
-  }
+    deleteReciept(id) {
+            return http.delete(`/deleteReciept/${id}`);
+        }
+        //reciept***
+    getAll() {
+        return http.get("/tutorials");
+    }
 
-  create(data) {
-    return http.post("/tutorials", data);
-  }
+    get(id) {
+        return http.get(`/tutorials/${id}`);
+    }
 
-  update(id, data) {
-    return http.put(`/tutorials/${id}`, data);
-  }
+    create(data) {
+        return http.post("/tutorials", data);
+    }
 
-  delete(id) {
-    return http.delete(`/tutorials/${id}`);
-  }
-  deleteCauses(id) {
-    return http.delete(`/causes/${id}`);
-  }
-  deleteCategory(id) {
-    return http.delete(`/category/${id}`);
-  }
+    update(id, data) {
+        return http.put(`/tutorials/${id}`, data);
+    }
 
-  deleteAll() {
-    return http.delete(`/tutorials`);
-  }
+    delete(id) {
+        return http.delete(`/tutorials/${id}`);
+    }
+    deleteCauses(id) {
+        return http.delete(`/causes/${id}`);
+    }
+    deleteCategory(id) {
+        return http.delete(`/category/${id}`);
+    }
 
-  findByTitle(title) {
-    return http.get(`/tutorials?title=${title}`);
-  }
+    deleteAll() {
+        return http.delete(`/tutorials`);
+    }
 
-  findByClassID(classID) {
-    return http.post(`/findByClassID/id=`, classID);
-  }
-  ////////////////////
+    findByTitle(title) {
+        return http.get(`/tutorials?title=${title}`);
+    }
 
-  createClass(data) {
-    return http.post("/createClass", data);
-  }
-  getAllCLass() {
-    return http.get("/getAllClass");
-  }
+    findByClassID(classID) {
+            return http.post(`/findByClassID/id=`, classID);
+        }
+        ////////////////////
 
-  getAllCauses() {
-    return http.get("/getAllCauses");
-  }
+    createClass(data) {
+        return http.post("/createClass", data);
+    }
+    getAllCLass() {
+        return http.get("/getAllClass");
+    }
 
-  getCategory() {
-    return http.get("/getCategory");
-  }
-  /////////////////// students
-  createStudent(data) {
-    return http.post("/createStudent", data);
-  }
-  deleteStudent(id) {
-    return http.delete(`/student/${id}`);
-  }
+    getAllCauses() {
+        return http.get("/getAllCauses");
+    }
 
-  findStudentByClassID(classID) {
-    return http.post(`/findStudentByClassID/id=`, classID);
-  }
-  //Category
-  createCategory(data) {
-    return http.post("/createCategory", data);
-  }
-  updateCat(id, data) {
-    return http.put(`/updateCat/${id}`, data);
-  }
+    getCategory() {
+            return http.get("/getCategory");
+        }
+        /////////////////// students
+    createStudent(data) {
+        return http.post("/createStudent", data);
+    }
+    deleteStudent(id) {
+        return http.delete(`/student/${id}`);
+    }
 
-  createCauses(data) {
-    return http.post("/createCauses", data);
-  }
-  createDate(data) {
-    return http.post("/createDate", data);
-  }
+    findStudentByClassID(classID) {
+            return http.post(`/findStudentByClassID/id=`, classID);
+        }
+        //Category
+    createCategory(data) {
+        return http.post("/createCategory", data);
+    }
+    updateCat(id, data) {
+        return http.put(`/updateCat/${id}`, data);
+    }
 
-  ///marks
-  createMarks(data) {
-    return http.post("/createMarks", data);
-  }
-  findMarks(classID) {
-    return http.post(`/findMarks/id=`, classID);
-  }
-  updateMark(id, data) {
-    return http.put(`/updateMark/${id}`, data);
-  }
+    createCauses(data) {
+        return http.post("/createCauses", data);
+    }
+    createDate(data) {
+        return http.post("/createDate", data);
+    }
 
-  ///*** FILE
-  sendFile(data) {
-    return httpFile.post(`/single-file`, data);
-  }
+    ///marks
+    createMarks(data) {
+        return http.post("/createMarks", data);
+    }
+    findMarks(classID) {
+        return http.post(`/findMarks/id=`, classID);
+    }
+    updateMark(id, data) {
+        return http.put(`/updateMark/${id}`, data);
+    }
 
-  getFile(data) {
-    return http.post(`/loadFileID`, data, {
-      responseType: "blob",
-      observe: "response",
-    });
-  }
+    ///*** FILE
+    sendFile(data) {
+        return httpFile.post(`/single-file`, data);
+    }
+
+    getFile(data) {
+        return http.post(`/loadFileID`, data, {
+            responseType: "blob",
+            observe: "response",
+        });
+    }
 }
 
 export default new TutorialDataService();
