@@ -229,7 +229,7 @@
         <button
           class="btn btn-primary"
           style="padding-right: 20px; margin-right: 20px"
-          @click="testGET(item)"
+          @click="downloadReceipt(item)"
         >
           Скачать
         </button>
@@ -285,6 +285,13 @@ export default {
     };
   },
   methods: {
+    clearFullData() {
+      this.receipts = [];
+      this.receiptsAll = [];
+      this.selectedStudentID = [];
+      this.Students = [];
+    },
+
     async changeClass(data) {
       this.loading = true;
       await this.getReciept(data);
@@ -294,6 +301,7 @@ export default {
       this.amountMarksFood();
       this.loading = false;
     },
+
     deleteReciept(data) {
       console.log(data);
       let text =
@@ -302,11 +310,22 @@ export default {
         " рублей с ID " +
         data.identifier;
       var isAdmin = confirm(text);
-
-      alert(isAdmin);
+      console.log(isAdmin);
+      if (isAdmin) {
+        TutorialDataService.deleteReciept(data._id)
+          .then((response) => {
+            console.log(response);
+            alert("Успешно!");
+            window.location.reload();
+          })
+          .catch((e) => {
+            alert("Ошибка");
+            console.log(e);
+          });
+      }
     },
 
-    testGET(data) {
+    downloadReceipt(data) {
       let dataFile = {
         classID: data.classID,
         studentID: data.studentID,
@@ -325,7 +344,7 @@ export default {
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName"
+              "fileName",
             );
           } else {
             var link = document.createElement("a");
@@ -497,7 +516,7 @@ export default {
         })
         .catch((e) => {
           alert(
-            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует."
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
           );
           console.log(e);
         });
@@ -520,13 +539,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            }
+            },
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            }
+            },
         );
     },
     getStudents(data) {
