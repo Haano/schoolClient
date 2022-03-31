@@ -3,7 +3,7 @@
   <div>
     <br />
     <div class="flex-food-main">
-      <div>
+      <div class="reciept">
         <div class="flex-food">
           <div>
             <b> Класс</b><b style="color: red">*</b>
@@ -123,14 +123,49 @@
         </div>
       </div>
 
-      <div>
-        Расчет по стоимости порции:
-        <input type="text" class="form-control" v-model="foodPrice" />
-        <br />
+      <div class="reciept">
+        <div>
+          Расчет по стоимости порции:
+          <input type="text" class="form-control" v-model="foodPrice" />
+
+          <div>
+            <div style="text-align: center; padding-top: 20px">
+              <b> Загрузить по диапазону</b>
+            </div>
+            <div class="select-flex">
+              <div style="padding-left: 0px; padding-right: 10px">От</div>
+              <input
+                type="date"
+                v-model="date"
+                id="date"
+                required
+                v-on:change="changeDate(date)"
+                class="form-control"
+              />
+              <div style="padding-left: 20px; padding-right: 10px">До</div>
+
+              <input
+                type="date"
+                v-model="date"
+                id="date"
+                required
+                v-on:change="changeDate(date)"
+                class="form-control"
+              />
+              <div style="text-align: center; margin: 0 20px 0 20px">
+                <button
+                  @click="test()"
+                  id="createReciept"
+                  class="btn btn-success"
+                >
+                  Загрузить
+                </button>
+              </div>
+            </div>
+          </div>
+          <br />
+        </div>
         <table class="reciept-table">
-          <caption>
-            Сводка по питанию
-          </caption>
           <thead>
             <tr>
               <th scope="col" style="width: 100px">Имя</th>
@@ -217,6 +252,7 @@
         </table>
       </div>
     </div>
+
     <br />
     <v-data-table
       :headers="headers"
@@ -300,6 +336,10 @@ export default {
       await this.getAmountCategory();
       this.amountMarksFood();
       this.loading = false;
+    },
+
+    test() {
+      alert("нажата");
     },
 
     deleteReciept(data) {
