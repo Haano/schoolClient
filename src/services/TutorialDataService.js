@@ -11,6 +11,10 @@ class TutorialDataService {
         return http.post(`/findReciept/id=`, classID);
     }
 
+    findRecieptByDateRange(data) {
+        return http.post(`/findRecieptByDateRange/`, data);
+    }
+
     deleteReciept(id) {
             return http.delete(`/deleteReciept/${id}`);
         }

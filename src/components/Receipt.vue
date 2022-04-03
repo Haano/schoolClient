@@ -124,46 +124,53 @@
       </div>
 
       <div class="reciept">
-        <div>
+        <div class="flex-food-main">
           Расчет по стоимости порции:
           <input type="text" class="form-control" v-model="foodPrice" />
 
-          <div>
-            <div style="text-align: center; padding-top: 20px">
-              <b> Загрузить по диапазону</b>
-            </div>
-            <div class="select-flex">
-              <div style="padding-left: 0px; padding-right: 10px">От</div>
-              <input
-                type="date"
-                v-model="date"
-                id="date"
-                required
-                v-on:change="changeDate(date)"
-                class="form-control"
-              />
-              <div style="padding-left: 20px; padding-right: 10px">До</div>
-
-              <input
-                type="date"
-                v-model="date"
-                id="date"
-                required
-                v-on:change="changeDate(date)"
-                class="form-control"
-              />
-              <div style="text-align: center; margin: 0 20px 0 20px">
-                <button
-                  @click="test()"
-                  id="createReciept"
-                  class="btn btn-success"
+          <div style="text-align: center">
+            <b> Загрузить по диапазону</b>
+            <div class="flex-food-main">
+              <div class="flex-food-main">
+                <div style="width: 30px; padding-top: 6px">От</div>
+                <div class="flex" style="width: 220px">
+                  <input
+                    type="date"
+                    v-model="dateFrom"
+                    id="date"
+                    required
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="flex-food-main">
+                <div style="width: 30px; padding-top: 6px">До</div>
+                <div class="flex" style="width: 220px">
+                  <input
+                    type="date"
+                    v-model="dateBefore"
+                    id="date"
+                    required
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="flex-food-main">
+                <div
+                  class="flex-food"
+                  style="width: 100px; padding: 2px 0 0 5px"
                 >
-                  Загрузить
-                </button>
+                  <button
+                    @click="getRecieptByRangeDate()"
+                    class="btn btn-success"
+                  >
+                    Загрузить
+                  </button>
+                </div>
               </div>
             </div>
+            <br />
           </div>
-          <br />
         </div>
         <table class="reciept-table">
           <thead>
@@ -215,7 +222,28 @@
                 <td>{{ selectedStudentID.amount }}</td>
                 <td>{{ selectedStudentID.amount * foodPrice }}</td>
                 <td>{{ selectedStudentID.amountReciept }}</td>
-                <td style="color: red">
+
+                <td
+                  v-if="
+                    selectedStudentID.amount * foodPrice -
+                      selectedStudentID.amountReciept <=
+                    0
+                  "
+                  style="color: green"
+                >
+                  {{
+                    selectedStudentID.amount * foodPrice -
+                    selectedStudentID.amountReciept
+                  }}
+                </td>
+                <td
+                  v-if="
+                    selectedStudentID.amount * foodPrice -
+                      selectedStudentID.amountReciept >
+                    0
+                  "
+                  style="color: red"
+                >
                   {{
                     selectedStudentID.amount * foodPrice -
                     selectedStudentID.amountReciept
@@ -293,6 +321,8 @@ export default {
       period: "",
       identifier: "",
       date: new Date(), //.toLocaleDateString(),
+      dateFrom: new Date(),
+      dateBefore: new Date(),
       chek: false,
       sCategory: [],
       foodPrice: 75,
@@ -338,8 +368,83 @@ export default {
       this.loading = false;
     },
 
+    async getRecieptByRangeDate() {
+      this.loading = true;
+      await this.test();
+      await this.getStudents(this.selectedClassID);
+      await this.getMarks(this.selectedClassID);
+      await this.getAmountCategory();
+      this.amountMarksFood();
+      this.loading = false;
+    },
+
     test() {
-      alert("нажата");
+      console.log(this.dateFrom);
+      // alert("нажата", this.dateFrom, this.dateBefore);
+      this.amountGetReciept = 0;
+      let data = {
+        classID: this.selectedClassID.classID,
+        studentID: this.selectedStudentID._id,
+        dateFrom: this.dateFrom,
+        dateBefore: this.dateBefore,
+      };
+      console.log(data);
+
+      TutorialDataService.findRecieptByDateRange(data).then((response) => {
+        console.log("RECIEPT", response.data);
+        this.receipts.splice(response.data);
+        var a = new Array();
+        a = Object.values(response.data);
+        for (let i = 0; i < a.length; i++) {
+          a[i].datePrint = new Date(a[i].date);
+          console.log("RECIEPT", a[i]);
+          a[i].datePrint = a[i].datePrint.toLocaleDateString();
+          console.log("RECIEPT", a[i]);
+          this.$set(this.receipts, i, a[i]);
+          // this.$set(this.Students[i], amount, 0);
+        }
+        for (let j = 0; j < this.receipts.length; j++) {
+          this.amountGetReciept += this.receipts[j].amount;
+        }
+      });
+      this.receiptsAll = this.receipts;
+    },
+
+    async getReciept(data) {
+      this.amountGetReciept = 0;
+      if (data) {
+        await TutorialDataService.findReciept(data)
+          .then((response) => {
+            console.log("RECIEPT", response.data);
+            this.receipts.splice(response.data);
+            var a = new Array();
+            a = Object.values(response.data);
+            for (let i = 0; i < a.length; i++) {
+              a[i].datePrint = new Date(a[i].date);
+              console.log("RECIEPT", a[i]);
+              a[i].datePrint = a[i].datePrint.toLocaleDateString();
+              console.log("RECIEPT", a[i]);
+              this.$set(this.receipts, i, a[i]);
+              // this.$set(this.Students[i], amount, 0);
+            }
+            for (let j = 0; j < this.receipts.length; j++) {
+              this.amountGetReciept += this.receipts[j].amount;
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      } else {
+        await TutorialDataService.findReciept()
+          .then((response) => {
+            console.log("RECIEPT", response.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+
+      this.receiptsAll = this.receipts;
     },
 
     deleteReciept(data) {
@@ -374,7 +479,6 @@ export default {
         className: this.selectedClassID.className,
       };
 
-      console.log(data, dataFile);
       TutorialDataService.getFile(dataFile)
         .then((response) => {
           console.log(response);
@@ -463,43 +567,6 @@ export default {
           }
         }
       }
-    },
-
-    async getReciept(data) {
-      this.amountGetReciept = 0;
-      if (data) {
-        await TutorialDataService.findReciept(data)
-          .then((response) => {
-            console.log("RECIEPT", response.data);
-            this.receipts.splice(response.data);
-            var a = new Array();
-            a = Object.values(response.data);
-            for (let i = 0; i < a.length; i++) {
-              a[i].datePrint = new Date(a[i].date);
-              console.log("RECIEPT", a[i]);
-              a[i].datePrint = a[i].datePrint.toLocaleDateString();
-              console.log("RECIEPT", a[i]);
-              this.$set(this.receipts, i, a[i]);
-              // this.$set(this.Students[i], amount, 0);
-            }
-            for (let j = 0; j < this.receipts.length; j++) {
-              this.amountGetReciept += this.receipts[j].amount;
-            }
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      } else {
-        await TutorialDataService.findReciept()
-          .then((response) => {
-            console.log("RECIEPT", response.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      }
-
-      this.receiptsAll = this.receipts;
     },
 
     amountMarksFood() {
@@ -627,6 +694,8 @@ export default {
       console.log(document.getElementById("date"), this.date);
       document.getElementById("date").value = new Date();
       this.date = new Date().toISOString().slice(0, 10);
+      this.dateFrom = new Date().toISOString().slice(0, 10);
+      this.dateBefore = new Date().toISOString().slice(0, 10);
       // this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
     },
 
