@@ -1,92 +1,114 @@
 <template>
   <div>
-    <div class="shift-name">
-      <section class="class-mark">
-        <header class="class-mark-item-text">1 смена</header>
-      </section>
-
-      <section class="class-mark">
-        <header class="class-mark-item-text">2 смена</header>
-      </section>
-    </div>
-
     <div class="class-marks">
       <div class="class-mark">
-        <div v-for="value in classList" :key="value.className">
-          <div
-            v-if="value.shift === '1 смена'"
-            :class="{
-              'class-mark-item-change': value.change,
-              'class-mark-item-BAD': !value.created,
-              'class-mark-item-ok': value.created,
-            }"
-          >
-            {{ value.className }}
+        <div class="class-mark-change">
+          <div>
+            Сформировать отчет на:
+            <select
+              name=""
+              v-model="globalOption"
+              class="form-select"
+              id=""
+              @change="changeGlobalOption(globalOption)"
+            >
+              <option>Отсутствующие</option>
+              <option>Питание</option>
+              <option>Питание 1 смена</option>
+              <option>Питание 2 смена</option>
+            </select>
+          </div>
+          <div>
+            <input
+              type="date"
+              id="Date"
+              class="form-control"
+              required
+              v-model="sDates.date"
+              @change="initialization()"
+            />
+          </div>
+          <div>
+            <button @click="initialization()" class="btn btn-success">
+              Обновить
+            </button>
+          </div>
+          <div>
+            <button @click="printStat()" class="btn btn-secondary">
+              Печать
+            </button>
           </div>
         </div>
       </div>
-      <div class="cat">
-        <select
-          name=""
-          v-model="globalOption"
-          class="form-select"
-          id=""
-          @change="changeGlobalOption(globalOption)"
-        >
-          <option>Отсутствующие</option>
-          <option>Питание</option>
-          <option>Питание 1 смена</option>
-          <option>Питание 2 смена</option>
-        </select>
-        <div class="cat-item">
-          <input
-            type="date"
-            id="Date"
-            class="form-control"
-            required
-            v-model="sDates.date"
-            @change="initialization()"
-          />
-          <button @click="initialization()" class="btn btn-success">
-            Обновить
-          </button>
-          <button @click="printStat()" class="btn btn-secondary">Печать</button>
+      <div>
+        <div class="class-mark">
+          <ul id="ul-stat">
+            <li>
+              Всего учеников:
+              <b style="padding: 0 5px 0 5px">
+                {{ studentsList.length }} (на
+                {{ new Date().toLocaleDateString() }})</b
+              >
+            </li>
+
+            <li>Данные отправлены на: {{ marks.length }}</li>
+            <li>
+              Отсутствует: {{ marksPrint.length }} ({{
+                reversedMessage(marksPrint.length)
+              }}%)
+            </li>
+            <li v-for="caus in countAll" :key="caus.causes">
+              {{ caus.causes }} = {{ caus.count }} ({{
+                reversedMessage(caus.count)
+              }}%)
+            </li>
+          </ul>
         </div>
+        <button @click="help()" class="btn btn-warning">Помощь</button>
       </div>
-      <div class="class-mark">
-        <div v-for="value in classList" :key="value.className">
-          <div
-            v-if="value.shift === '2 смена'"
-            :class="{
-              'class-mark-item-change': value.change,
-              'class-mark-item-BAD': !value.created,
-              'class-mark-item-ok': value.created,
-            }"
-          >
-            {{ value.className }}
+      <div>
+        <div>
+          <div class="class-mark">
+            <section class="class-mark-shift">
+              <header>1 смена</header>
+            </section>
+
+            <div v-for="value in classList" :key="value.className">
+              <div
+                v-if="value.shift === '1 смена'"
+                :class="{
+                  'class-mark-item-change': value.change,
+                  'class-mark-item-BAD': !value.created,
+                  'class-mark-item-ok': value.created,
+                }"
+              >
+                {{ value.className }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="class-mark">
+            <section class="class-mark-shift">
+              <header>2 смена</header>
+            </section>
+
+            <div v-for="value in classList" :key="value.className">
+              <div
+                v-if="value.shift === '2 смена'"
+                :class="{
+                  'class-mark-item-change': value.change,
+                  'class-mark-item-BAD': !value.created,
+                  'class-mark-item-ok': value.created,
+                }"
+              >
+                {{ value.className }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div>
-      <ul id="ul-stat">
-        <li>
-          Всего учеников:
-          <b style="padding: 0 5px 0 5px">
-            {{ studentsList.length }} (на
-            {{ new Date().toLocaleDateString() }})</b
-          >
-        </li>
-
-        <li>Данные отправлены на: {{ marks.length }}</li>
-        <li>Отсутствует: {{ marksPrint.length }}</li>
-        <li v-for="caus in countAll" :key="caus.causes">
-          {{ caus.causes }} = {{ caus.count }} ({{
-            reversedMessage(caus.count)
-          }}%)
-        </li>
-      </ul>
     </div>
 
     <div v-if="globalOption === 'Отсутствующие'">
@@ -125,7 +147,6 @@
         </v-data-table>
       </div>
     </div>
-    <button @click="help()" class="btn btn-success">Помощь</button>
   </div>
 </template>
 
@@ -434,7 +455,6 @@ export default {
       this.$set(this.headersEat, 1, {
         text: "Всего",
         value: "count",
-        width: "100px",
         sortable: false,
       });
 
@@ -448,7 +468,7 @@ export default {
         this.$set(this.headersEat, i + 2, {
           text: this.sCategory[i].sCategory,
           value: this.sCategory[i].id,
-          width: "100px",
+
           sortable: false,
         });
       }
@@ -587,22 +607,46 @@ export default {
   display: flex;
   justify-content: space-around;
   flex-direction: row;
-  margin: 20px 0px 0px 0px;
 }
 .class-marks {
+  text-align: center;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
-  margin: 0 -50px;
+  margin: 1px;
 }
 
 .class-mark {
-  max-width: 650px;
+  margin: 5px;
+  text-align: center;
+  width: 350px;
   display: flex;
-  justify-self: center;
-  margin: 0 0px;
+  justify-content: center;
+
   flex-wrap: wrap;
-  padding: 0px 5% 0px 10%;
+  border-radius: 3px;
+  box-shadow: 0 0 3px #4d4d4d;
+
+  margin: 5px 5px 5px 5px;
+}
+.class-mark-shift {
+  text-align: center;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+
+  flex-wrap: wrap;
+}
+
+.class-mark-change {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 300px;
+}
+.class-mark-change div {
+  padding: 2px;
 }
 .class-mark-item-text {
   background-color: green;

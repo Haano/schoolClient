@@ -1,4 +1,3 @@
-<!--// 17 03 22 -->
 <template>
   <div>
     <br />
@@ -125,8 +124,46 @@
 
       <div class="reciept">
         <div class="flex-food-main">
-          Расчет по стоимости порции:
-          <input type="text" class="form-control" v-model="foodPrice" />
+          <div class="flex-food">
+            <div>
+              <b> Класс</b><b style="color: red">*</b>
+              <select
+                class="form-select"
+                v-model="selectedClassID"
+                @change="changeClass(selectedClassID)"
+              >
+                <option
+                  v-for="user in sClass"
+                  :key="user.className"
+                  v-bind:value="user"
+                >
+                  {{ user.className }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <b> Ученик </b><b style="color: red">*</b>
+              <select
+                class="form-select"
+                v-model="selectedStudentID"
+                @change="changeStudent(selectedStudentID)"
+              >
+                <option>Все</option>
+                <option
+                  v-for="user in Students"
+                  :key="user.FirstName"
+                  v-bind:value="user"
+                >
+                  {{ user.FirstName }} {{ user.LastName }}
+                </option>
+              </select>
+            </div>
+            <div>
+              Расчет по стоимости порции:
+              <input type="text" class="form-control" v-model="foodPrice" />
+            </div>
+          </div>
 
           <div style="text-align: center">
             <b> Загрузить по диапазону</b>
@@ -352,6 +389,11 @@ export default {
   },
   methods: {
     clearFullData() {
+      this.marks = [];
+      this.amount = 0;
+      this.amountGetReciept = 0;
+      this.amountStudentFood = {};
+      this.amountFood = {};
       this.receipts = [];
       this.receiptsAll = [];
       this.selectedStudentID = [];
@@ -359,26 +401,28 @@ export default {
     },
 
     async changeClass(data) {
+      this.clearFullData();
       this.loading = true;
       await this.getReciept(data);
       await this.getStudents(data);
       await this.getMarks(data);
       await this.getAmountCategory();
-      this.amountMarksFood();
+      await this.amountMarksFood();
       this.loading = false;
     },
 
     async getRecieptByRangeDate() {
+      this.clearFullData();
       this.loading = true;
-      await this.test();
+      await this.getRecieptsByRangeDatePOST();
       await this.getStudents(this.selectedClassID);
-      await this.getMarks(this.selectedClassID);
+      await this.getMarksByRangeDatePOST(this.selectedClassID);
       await this.getAmountCategory();
-      this.amountMarksFood();
+      await this.amountMarksFood();
       this.loading = false;
     },
 
-    test() {
+    getRecieptsByRangeDatePOST() {
       console.log(this.dateFrom);
       // alert("нажата", this.dateFrom, this.dateBefore);
       this.amountGetReciept = 0;
@@ -388,18 +432,16 @@ export default {
         dateFrom: this.dateFrom,
         dateBefore: this.dateBefore,
       };
-      console.log(data);
 
       TutorialDataService.findRecieptByDateRange(data).then((response) => {
-        console.log("RECIEPT", response.data);
         this.receipts.splice(response.data);
         var a = new Array();
         a = Object.values(response.data);
         for (let i = 0; i < a.length; i++) {
           a[i].datePrint = new Date(a[i].date);
-          console.log("RECIEPT", a[i]);
+
           a[i].datePrint = a[i].datePrint.toLocaleDateString();
-          console.log("RECIEPT", a[i]);
+
           this.$set(this.receipts, i, a[i]);
           // this.$set(this.Students[i], amount, 0);
         }
@@ -410,20 +452,46 @@ export default {
       this.receiptsAll = this.receipts;
     },
 
+    async getMarksByRangeDatePOST(ID) {
+      await TutorialDataService.findMarksByDateRange({
+        classID: ID,
+        dateFrom: this.dateFrom,
+        dateBefore: this.dateBefore,
+      })
+        .then((response) => {
+          //this.getMarksToPrint(Object.values(response.data));
+
+          this.marks = Object.values(response.data);
+          for (let j = 0; j < this.Students.length; j++) {
+            this.Students[j].amount = 0;
+
+            for (let i = 0; i < this.marks.length; i++)
+              if (
+                this.marks[i].studentID === this.Students[j]._id &&
+                this.marks[i].causesID === "Питался"
+              ) {
+                this.Students[j].amount += 1;
+              }
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+
     async getReciept(data) {
       this.amountGetReciept = 0;
       if (data) {
         await TutorialDataService.findReciept(data)
           .then((response) => {
-            console.log("RECIEPT", response.data);
             this.receipts.splice(response.data);
             var a = new Array();
             a = Object.values(response.data);
             for (let i = 0; i < a.length; i++) {
               a[i].datePrint = new Date(a[i].date);
-              console.log("RECIEPT", a[i]);
+
               a[i].datePrint = a[i].datePrint.toLocaleDateString();
-              console.log("RECIEPT", a[i]);
+
               this.$set(this.receipts, i, a[i]);
               // this.$set(this.Students[i], amount, 0);
             }
@@ -448,20 +516,20 @@ export default {
     },
 
     deleteReciept(data) {
-      console.log(data);
       let text =
         "Вы действительно хотите удалить квитанцию на сумму " +
         data.amount +
         " рублей с ID " +
         data.identifier;
       var isAdmin = confirm(text);
-      console.log(isAdmin);
+
       if (isAdmin) {
         TutorialDataService.deleteReciept(data._id)
           .then((response) => {
             console.log(response);
             alert("Успешно!");
-            window.location.reload();
+            this.getRecieptByRangeDate();
+            // window.location.reload();
           })
           .catch((e) => {
             alert("Ошибка");
@@ -481,14 +549,13 @@ export default {
 
       TutorialDataService.getFile(dataFile)
         .then((response) => {
-          console.log(response);
           var blob = response.data;
           var contentType = response.data.type; //getResponseHeader("content-type");
 
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName",
+              "fileName"
             );
           } else {
             var link = document.createElement("a");
@@ -532,12 +599,11 @@ export default {
       })
         .then((response) => {
           //this.getMarksToPrint(Object.values(response.data));
-          console.log("ответ", response.data);
+
           this.marks = Object.values(response.data);
           for (let j = 0; j < this.Students.length; j++) {
             this.Students[j].amount = 0;
 
-            console.log("ЗАМЕНА", this.Students[j]);
             for (let i = 0; i < this.marks.length; i++)
               if (
                 this.marks[i].studentID === this.Students[j]._id &&
@@ -550,13 +616,13 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-      console.log(this.mark);
     },
+
+    //считает по категориям, сколько питалась та или иная категория
     getAmountCategory() {
       for (let j = 0; j < this.sCategory.length; j++) {
         this.sCategory[j].count = 0;
       }
-      console.log("!!!!!", this.marks, this.sCategory);
       for (let i = 0; i < this.marks.length; i++) {
         for (let j = 0; j < this.sCategory.length; j++) {
           if (
@@ -580,14 +646,12 @@ export default {
 
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
-      console.log(this.file);
     },
 
     async createReciept() {
       for (let i = 0; i < this.amount.length; i++) {
         this.amount[i];
       }
-      console.log("this.selectedStudentID._id", this.selectedStudentID);
       if (this.file) {
         var data = {
           classID: this.selectedClassID.classID,
@@ -618,20 +682,18 @@ export default {
         .then((response) => {
           console.log(response.data);
           alert("Квитанция создана", data);
-
-          window.location.reload();
+          this.changeClass(this.selectedClassID);
+          //window.location.reload();
         })
         .catch((e) => {
           alert(
-            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует."
           );
           console.log(e);
         });
     },
 
     async sendFileToServer() {
-      console.log("ОТПРАВКА", this.file);
-
       let data = new FormData();
       data.append("file", this.file, this.file.name); // очень важный data.append ("файл", файл); неудачно
       data.append("studentID", this.selectedStudentID._id);
@@ -640,19 +702,18 @@ export default {
       data.append("classID", this.selectedClassID.classID);
       data.append("className", this.selectedClassID.className);
 
-      console.log("ОТПРАВКА", data);
       TutorialDataService.sendFile(data)
         .then(
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            },
+            }
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            },
+            }
         );
     },
     getStudents(data) {
@@ -666,7 +727,6 @@ export default {
             a[i].amountReciept = 0;
             for (let j = 0; j < this.receipts.length; j++) {
               if (a[i]._id === this.receipts[j].studentID) {
-                console.log(this.receipts[j].amount, "OOOOO!!!!!!!!", a[i]);
                 a[i].amountReciept =
                   a[i].amountReciept + this.receipts[j].amount;
                 this.receipts[j].FirstName = a[i].FirstName;
@@ -684,14 +744,12 @@ export default {
     },
 
     changeDate(value) {
-      let a = new Date(value);
-      console.log(value, a);
+      // let a = new Date(value);
       this.date = value;
     },
 
     retriveDate() {
       //поставить текущую дату
-      console.log(document.getElementById("date"), this.date);
       document.getElementById("date").value = new Date();
       this.date = new Date().toISOString().slice(0, 10);
       this.dateFrom = new Date().toISOString().slice(0, 10);
@@ -714,13 +772,10 @@ export default {
       TutorialDataService.getCategory()
         .then((response) => {
           this.sCategory = response.data.map(this.getDispleyCategory);
-          console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
         });
-
-      console.log(this.sCategory);
     },
 
     getDispleyCategory(data) {
