@@ -239,6 +239,7 @@
               >
                 {{ amountFood.amount * foodPrice - amountGetReciept }}
               </td>
+              <td v-else>0</td>
             </tr>
             <tr v-for="item in sCategory" :key="item.message">
               <td>{{ item.sCategory }}</td>
@@ -286,6 +287,7 @@
                     selectedStudentID.amountReciept
                   }}
                 </td>
+                <td v-if="!selectedStudentID.amount">0</td>
               </tr>
             </template>
             <template v-if="chek">
@@ -555,7 +557,7 @@ export default {
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName"
+              "fileName",
             );
           } else {
             var link = document.createElement("a");
@@ -687,7 +689,7 @@ export default {
         })
         .catch((e) => {
           alert(
-            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует."
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
           );
           console.log(e);
         });
@@ -707,13 +709,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            }
+            },
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            }
+            },
         );
     },
     getStudents(data) {
