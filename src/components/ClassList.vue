@@ -66,6 +66,7 @@ import TutorialDataService from "../services/TutorialDataService";
 
 export default {
   // components: { AddClass },
+
   name: "tutorials-list",
   data() {
     return {
