@@ -38,8 +38,53 @@
               Печать
             </button>
           </div>
+
+          <div class="class-mark-change">
+            <b> Загрузить по диапазону</b>
+            <div class="flex-food-main">
+              <div class="flex-food-main">
+                <div style="width: 30px; padding-top: 6px">От</div>
+                <div class="flex" style="width: 220px">
+                  <input
+                    type="date"
+                    v-model="dateFrom"
+                    id="DateFrom"
+                    required
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="flex-food-main">
+                <div style="width: 30px; padding-top: 6px">До</div>
+                <div class="flex" style="width: 220px">
+                  <input
+                    type="date"
+                    v-model="dateBefore"
+                    id="DateBefore"
+                    required
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="flex-food-main">
+                <div
+                  class="flex-food"
+                  style="width: 100px; padding: 2px 0 0 5px"
+                >
+                  <button
+                    @click="initializationByRange()"
+                    class="btn btn-success"
+                  >
+                    Загрузить
+                  </button>
+                </div>
+              </div>
+            </div>
+            <br />
+          </div>
         </div>
       </div>
+
       <div>
         <div class="class-mark">
           <ul id="ul-stat">
@@ -155,6 +200,8 @@ import TutorialDataService from "../services/TutorialDataService";
 export default {
   data() {
     return {
+      dateFrom: [],
+      dateBefore: [],
       sCategory: [],
       globalOption: [],
       headers: [
@@ -217,6 +264,17 @@ export default {
       this.changeGlobalOption(this.globalOption);
       //посчитать данные
     },
+    async initializationByRange() {
+      this.clearFullData();
+
+      await this.getAllClass(); //get классов в classList
+      await this.getMarksByDateRange(); // получить все марки (marks and marksPrint)
+      await this.findAllStudents(); // получить всех учеников (students)
+      await this.defineTileColorClass(); //покрасить плитки в нужный цвет
+      await this.countStat();
+      this.changeGlobalOption(this.globalOption);
+      //посчитать данные
+    },
 
     clearFullData() {
       this.classList = [];
@@ -250,6 +308,22 @@ export default {
           console.log(e);
         });
     },
+
+    async getMarksByDateRange() {
+      await TutorialDataService.findMarksByDateRange({
+        classID: null,
+        dateFrom: this.dateFrom,
+        dateBefore: this.dateBefore,
+      })
+        .then((response) => {
+          this.getMarksToPrint(Object.values(response.data));
+          this.marks = Object.values(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+
     getMarksToPrint(data) {
       data.map((mark) => {
         if (mark.causesID != "" && mark.causesID != "Питался") {
@@ -292,7 +366,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения"
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
       );
     },
     async getFullNameStudents() {
@@ -305,12 +379,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName
+              this.studentsList[i].FirstName,
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName
+              this.studentsList[i].LastName,
             );
             change = true;
             console.log(" BREAK j", j);
@@ -393,8 +467,12 @@ export default {
 
     retrieveData() {
       //поставить текущую дату
-      document.getElementById("Date").value = new Date();
+      // document.getElementById("Date").value = new Date();
+      // document.getElementById("DateBefore").value = new Date();
+      // document.getElementById("DateFrom").value = new Date();
       this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
+      this.dateFrom = new Date().toISOString().slice(0, 10);
+      this.dateBefore = new Date().toISOString().slice(0, 10);
     },
 
     getDisplayClass(data) {
@@ -522,7 +600,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1
+              this.classListAll[j].count + 1,
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -533,12 +611,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i]
+                  arrayCat[i],
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1
+                  this.sCategory[i].count + 1,
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -555,7 +633,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count
+          this.sCategory[i].count,
         );
       }
 
@@ -571,6 +649,7 @@ export default {
           console.log(e);
         });
     },
+
     getDispleyCategory(data) {
       return {
         sCategory: data.cat,
@@ -580,7 +659,7 @@ export default {
     },
 
     reversedMessage: function (data) {
-      let a = (data / this.studentsList.length) * 100;
+      let a = (data / this.marks.length) * 100;
       console.log(a);
       // `this` указывает на экземпляр vm
       return a.toFixed(2);
