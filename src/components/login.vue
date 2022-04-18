@@ -1,5 +1,22 @@
 <template>
-  <div v-if="show" class="modal-shadow" @click.self="closeModal">
+  <div style="width: 200px">
+    <!-- Класс
+    <select
+      class="form-select"
+      v-model="selectedClassID"
+      @change="show(selectedClassID)"
+    >
+      <option v-for="user in sClass" :key="user.className" v-bind:value="user">
+        {{ user.className }}
+      </option>
+    </select> -->
+
+    Пароль
+    <input type="text" class="form-control" v-model="password" />
+
+    <!-- <button @click="del">DELETE</button> -->
+  </div>
+  <!-- <div v-if="show" class="modal-shadow" @click.self="closeModal">
     <div>
       <div class="modal-close" @click="closeModal">&#10006;</div>
       <slot name="title">
@@ -14,20 +31,30 @@
         </div>
       </slot>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script>
 export default {
-  name: "ModalWindow",
   data: function () {
-    return {
-      show: false,
-    };
+    return { password: "" };
   },
   methods: {
-    closeModal: function () {
-      this.show = false;
+    del() {
+      localStorage.clear();
+    },
+  },
+  mounted() {
+    this.del();
+  },
+  watch: {
+    password: function () {
+      if (this.password === "1") {
+        console.log("OK");
+        localStorage.setItem("user", 1);
+
+        this.$router.push("/dashboard");
+      }
     },
   },
 };

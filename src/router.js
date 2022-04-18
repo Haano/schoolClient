@@ -3,10 +3,10 @@ import Router from "vue-router";
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
     mode: "history",
     routes: [{
-            path: "/",
+            path: "/dashboard",
             name: "Dashboard",
             component: () =>
                 import ("./components/Dashboard"),
@@ -53,12 +53,7 @@ export default new Router({
             component: () =>
                 import ("./components/CreateDate"),
         },
-        {
-            path: "/Dashboard",
-            name: "Dashboard",
-            component: () =>
-                import ("./components/Dashboard"),
-        },
+
         {
             path: "/Statistic",
             name: "Statistic",
@@ -72,10 +67,36 @@ export default new Router({
                 import ("./components/Receipt"),
         },
         {
-            path: "/login",
+            path: "/",
             name: "login",
+
             component: () =>
                 import ("./components/login"),
         },
     ],
 });
+
+//let auth = true;
+
+router.beforeEach((to, from, next) => {
+    const currentUser = localStorage.getItem("user");
+    console.log(currentUser);
+    if (!currentUser && to.name !== "login") {
+        console.log(currentUser);
+        next({ path: "/" });
+    } else {
+        if (currentUser) {
+            next();
+        } else {
+            next();
+        }
+    }
+
+    // if (auth) {
+    //     next("login");
+    // } else {
+    //     next("/");
+    // }
+});
+
+export default router;
