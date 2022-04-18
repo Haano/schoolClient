@@ -1,6 +1,8 @@
 <template>
-  <div style="width: 200px">
-    <!-- Класс
+  <div>
+    <h2>Вход в систему ACT</h2>
+    <div style="width: 200px">
+      <!-- Класс
     <select
       class="form-select"
       v-model="selectedClassID"
@@ -11,12 +13,12 @@
       </option>
     </select> -->
 
-    Пароль
-    <input type="text" class="form-control" v-model="password" />
+      Пароль
+      <input type="text" class="form-control" v-model="password" />
 
-    <!-- <button @click="del">DELETE</button> -->
-  </div>
-  <!-- <div v-if="show" class="modal-shadow" @click.self="closeModal">
+      <!-- <button @click="del">DELETE</button> -->
+    </div>
+    <!-- <div v-if="show" class="modal-shadow" @click.self="closeModal">
     <div>
       <div class="modal-close" @click="closeModal">&#10006;</div>
       <slot name="title">
@@ -32,6 +34,7 @@
       </slot>
     </div>
   </div> -->
+  </div>
 </template>
 
 <script>
