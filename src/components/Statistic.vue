@@ -28,12 +28,12 @@
               @change="initialization()"
             />
           </div>
+
           <div>
             <button @click="initialization()" class="btn btn-success">
               Обновить
             </button>
-          </div>
-          <div>
+
             <button @click="printStat()" class="btn btn-secondary">
               Печать
             </button>
@@ -80,7 +80,40 @@
                 </div>
               </div>
             </div>
-            <br />
+          </div>
+
+          <div class="flex-food">
+            <div style="display: flex; align-items: stretch">
+              <div>
+                <b> Класс</b>
+                <select class="form-select" v-model="selectedClassID">
+                  <option
+                    v-for="user in classList"
+                    :key="user.className"
+                    v-bind:value="user"
+                  >
+                    {{ user.className }}
+                  </option>
+                </select>
+              </div>
+              <div style="width: 200px">
+                <b>Ученик</b>
+                <select class="form-select" v-model="selectedStudentID">
+                  <option
+                    v-for="user in studentsListByClassID"
+                    :key="user._id"
+                    v-bind:value="user"
+                  >
+                    {{ user.FirstName }} {{ user.LastName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="flex-food">
+              <button @click="initializationByClass()" class="btn btn-success">
+                Загрузить
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -166,6 +199,9 @@
             hide-default-footer
             id="table"
           >
+            <template v-slot:[`item.index`]="{ index }">
+              {{ index + 1 }}
+            </template>
           </v-data-table>
         </v-col>
       </div>
@@ -206,6 +242,11 @@ export default {
       globalOption: [],
       headers: [
         {
+          value: "index",
+          text: "#",
+          width: "30px",
+        },
+        {
           text: "Класс",
           value: "className",
           sortable: true,
@@ -213,21 +254,26 @@ export default {
         {
           text: "Фамилия",
           value: "FirstName",
-          sortable: false,
+          sortable: true,
         },
         {
           text: "Имя",
           value: "LastName",
           sortable: false,
         },
-        // {
-        //   text: "Категория",
-        //   value: "cat",
-        //   sortable: false,
-        // },
+        {
+          text: "Категория",
+          value: "cat",
+          sortable: false,
+        },
         {
           text: "Причина",
           value: "causesID",
+          sortable: false,
+        },
+        {
+          text: "Дата",
+          value: "date",
           sortable: false,
         },
       ],
@@ -243,12 +289,16 @@ export default {
       marksPrint: [],
       sDates: [],
       classList: [],
+      classListOption: [],
       classListAll: [],
       studentsList: [{ FirstName: "1", LastName: "2" }],
       countAll: [{ causes: "21231" }],
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
       activeClassChange: "class-mark-item-change",
+      selectedClassID: "",
+      studentsListByClassID: [{}],
+      selectedStudentID: "",
     };
   },
 
@@ -275,14 +325,54 @@ export default {
       this.changeGlobalOption(this.globalOption);
       //посчитать данные
     },
+    async initializationByClass() {
+      this.clearFullDataClass();
+      //await this.getAllClass();
+      await this.changeClass();
+      await this.getMarksByDateRange(); // получить все марки (marks and marksPrint)
+      await this.findAllStudents(); // получить всех учеников (students)
+      await this.defineTileColorClass(); //покрасить плитки в нужный цвет
+      await this.countStat();
+      // this.changeGlobalOption(this.globalOption);
+    },
 
     clearFullData() {
       this.classList = [];
       this.studentsList = [];
+      this.selectedClassID = "";
+      this.studentsListByClassID = [{}];
+      this.selectedStudentID = "";
       this.marks = [];
       this.students = [];
       this.marksPrint = [];
       this.countAll = [{ causes: "1", count: 0 }];
+    },
+
+    clearFullDataClass() {
+      this.studentsList = [];
+      this.studentsListByClassID = [{}];
+      this.selectedStudentID = "";
+      this.marks = [];
+      this.students = [];
+      this.marksPrint = [];
+      this.countAll = [{ causes: "1", count: 0 }];
+    },
+
+    changeClass() {
+      this.studentsListByClassID = [{}];
+      this.selectedStudentID = "";
+
+      this.classList = this.classList.filter(
+        (ID) => ID === this.selectedClassID
+      );
+      console.log("@@@@@@@@@@@@@@", this.classList);
+
+      this.changeGlobalOption(this.globalOption);
+      for (let i = 0; i < this.studentsList.length; i++) {
+        if (this.studentsList[i].classID === this.selectedClassID.classID) {
+          this.studentsListByClassID.push(this.studentsList[i]);
+        }
+      }
     },
 
     async getAllClass() {
@@ -290,19 +380,31 @@ export default {
       await TutorialDataService.getAllCLass()
         .then((response) => {
           this.classList = response.data.map(this.getDisplayClass);
+          this.classListOption = response.data.map(this.getDisplayClass);
         })
         .catch((e) => {
           console.log(e);
         });
     },
     async getMarks() {
+      let classID = this.selectedClassID;
+      console.log("@@@@@@@@", classID);
+      if (classID.length === 0) {
+        classID = null;
+      }
+
       await TutorialDataService.findMarks({
-        classID: null,
+        classID: classID,
         date: this.sDates.date,
       })
         .then((response) => {
-          this.getMarksToPrint(Object.values(response.data));
-          this.marks = Object.values(response.data);
+          let temp = Object.values(response.data);
+
+          for (let i = 0; i < temp.length; i++) {
+            temp[i].date = new Date(temp[i].date).toLocaleDateString();
+          }
+          this.getMarksToPrint(Object.values(temp));
+          this.marks = Object.values(temp);
         })
         .catch((e) => {
           console.log(e);
@@ -310,14 +412,25 @@ export default {
     },
 
     async getMarksByDateRange() {
+      let classID = this.selectedClassID;
+
+      if (classID.length === 0) {
+        classID = null;
+      }
+
       await TutorialDataService.findMarksByDateRange({
-        classID: null,
+        classID: classID,
         dateFrom: this.dateFrom,
         dateBefore: this.dateBefore,
       })
         .then((response) => {
-          this.getMarksToPrint(Object.values(response.data));
-          this.marks = Object.values(response.data);
+          let temp = Object.values(response.data);
+
+          for (let i = 0; i < temp.length; i++) {
+            temp[i].date = new Date(temp[i].date).toLocaleDateString();
+          }
+          this.getMarksToPrint(Object.values(temp));
+          this.marks = Object.values(temp);
         })
         .catch((e) => {
           console.log(e);
@@ -366,7 +479,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
       );
     },
     async getFullNameStudents() {
@@ -379,12 +492,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName,
+              this.studentsList[i].FirstName
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName,
+              this.studentsList[i].LastName
             );
             change = true;
             console.log(" BREAK j", j);
@@ -600,7 +713,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1,
+              this.classListAll[j].count + 1
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -611,12 +724,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i],
+                  arrayCat[i]
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1,
+                  this.sCategory[i].count + 1
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -633,7 +746,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count,
+          this.sCategory[i].count
         );
       }
 

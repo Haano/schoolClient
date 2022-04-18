@@ -557,7 +557,7 @@ export default {
           if (window.navigator.msSaveOrOpenBlob) {
             window.navigator.msSaveOrOpenBlob(
               new Blob([blob], { type: contentType }),
-              "fileName",
+              "fileName"
             );
           } else {
             var link = document.createElement("a");
@@ -689,7 +689,7 @@ export default {
         })
         .catch((e) => {
           alert(
-            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует.",
+            "ОШИБКА, Квитанция не сохранена, повторите попытку позднее. Возможно такой ID уже существует."
           );
           console.log(e);
         });
@@ -709,13 +709,13 @@ export default {
           (res) =>
             function () {
               console.log("SUCCESS!!", res);
-            },
+            }
         )
         .catch(
           (res) =>
             function () {
               console.log("FAILURE!!", res.data.files, res.status);
-            },
+            }
         );
     },
     getStudents(data) {
