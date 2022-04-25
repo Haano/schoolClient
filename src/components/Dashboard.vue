@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button @click="check()">ПРОВЕРКА</button>
     <div class="flex">
       <div>
         <br />
@@ -8,6 +9,7 @@
           class="form-select"
           v-model="selectedClassID"
           @change="show(selectedClassID)"
+          id="class"
         >
           <option
             v-for="user in sClass"
@@ -64,12 +66,11 @@
         <div v-else>
           <button
             id="sendData"
-            class="btn btn-primary"
-            @click="send()"
+            class="btn btn-danger"
             color="primary"
             disabled="true"
           >
-            ОТПРАВИТЬ ДАННЫЕ
+            Данные были отправлены
           </button>
         </div>
       </div>
@@ -104,6 +105,9 @@
               </div>
 
               <!-- <span>{{ item.date }}{{ item }}</span> -->
+              <!-- <div v-if="item.date === this.sDates">
+                {{ item }}
+              </div> -->
               <v-card-actions id="update" v-show="marks.length > 0">
                 <button
                   v-bind:id="item._id + 'update'"
@@ -129,6 +133,9 @@
 import TutorialDataService from "../services/TutorialDataService";
 
 export default {
+  props: {
+    selectedClass: Object,
+  },
   data() {
     return {
       countMark: [],
@@ -168,6 +175,10 @@ export default {
   },
 
   methods: {
+    check() {
+      console.log(this.selectedClass);
+    },
+
     async pow(x, data, test, data2) {
       if (x === 0) {
         return;
@@ -267,9 +278,13 @@ export default {
       this.$set(this.causesDefault[1], "count", 0);
 
       for (i = 0; i < this.sClassInput.length; i++) {
+        // let but = document.getElementById(this.sClassInput[i]._id + "update");
         document.getElementById(
           this.sClassInput[i]._id + "update"
         ).disabled = false;
+        // document
+        //   .getElementById(this.sClassInput[i]._id + "update")
+        //   .parentNode.removeChild(but);
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
             this.$set(this.sClassInput[i], "date", this.marks[j].causesID);
@@ -316,10 +331,18 @@ export default {
             document.getElementById(
               this.marks[i].studentID + "update"
             ).disabled = false;
+
+            // let but = document.getElementById(
+            //   this.marks[i].studentID + "update"
+            // );
+            // but.remove();
           } else {
             document.getElementById(
               this.marks[i].studentID + "update"
             ).disabled = true;
+            document
+              .getElementById(this.marks[i].studentID + "update")
+              .remove();
           }
         }
       } else {
@@ -328,7 +351,7 @@ export default {
       }
     },
 
-    async selectedSelect() {
+    selectedSelect() {
       var a;
 
       for (var i = 0; i < this.sClassInput.length; i++) {
@@ -341,6 +364,7 @@ export default {
               a.name = "";
             } else {
               a.name = a.options[j].text;
+              a.disabled = true;
             }
           }
 
@@ -454,6 +478,7 @@ export default {
     },
 
     show(data) {
+      this.sClassInput = [];
       data = this.selectedClassID;
       console.log(data);
       TutorialDataService.findStudentByClassID(data)
@@ -475,7 +500,7 @@ export default {
       }
     },
 
-    retrieveClass() {
+    async retrieveClass() {
       //поставить текущую дату
       document.getElementById("Date").value = new Date();
       this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
@@ -488,13 +513,19 @@ export default {
       });
 
       //получить список классов
-      TutorialDataService.getAllCLass()
+      await TutorialDataService.getAllCLass()
         .then((response) => {
           this.sClass = response.data.map(this.getDisplayClass);
         })
         .catch((e) => {
           console.log(e);
         });
+
+      if (this.selectedClass.classID != "admin") {
+        this.selectedClassID = this.selectedClass;
+        this.show();
+        document.getElementById("class").disabled = true;
+      }
     },
 
     getDisplayClassID(data) {

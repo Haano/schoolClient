@@ -8,6 +8,7 @@
           class="form-select light"
           v-model="selectedClassID"
           @change="getStudents(selectedClassID)"
+          id="class"
         >
           <option
             v-for="user in sClass"
@@ -148,6 +149,9 @@
 <script>
 import TutorialDataService from "../services/TutorialDataService";
 export default {
+  props: {
+    selectedClass: Object,
+  },
   data() {
     return {
       headers: [
@@ -285,6 +289,13 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+
+      if (this.selectedClass.classID != "admin") {
+        this.selectedClassID = this.selectedClass;
+        document.getElementById("class").disabled = true;
+
+        this.getStudents(this.selectedClassID);
+      }
     },
     refreshList() {
       this.initialization();

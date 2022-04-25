@@ -10,6 +10,7 @@
               class="form-select"
               v-model="selectedClassID"
               @change="changeClass(selectedClassID)"
+              name="class"
             >
               <option
                 v-for="user in sClass"
@@ -131,6 +132,7 @@
                 class="form-select"
                 v-model="selectedClassID"
                 @change="changeClass(selectedClassID)"
+                name="class"
               >
                 <option
                   v-for="user in sClass"
@@ -208,6 +210,17 @@
             </div>
             <br />
           </div>
+
+          <div class="flex-food-main">
+            Показать категории в таблице
+            <div class="flex-food-main" style="width: 30px">
+              <input
+                style="width: 30px; height: 20px"
+                type="checkbox"
+                v-model="showCategory"
+              />
+            </div>
+          </div>
         </div>
         <table class="reciept-table">
           <thead>
@@ -241,13 +254,15 @@
               </td>
               <td v-else>0</td>
             </tr>
+
             <tr v-for="item in sCategory" :key="item.message">
-              <td>{{ item.sCategory }}</td>
-              <td>{{ item.count }}</td>
-              <td>{{ item.count * foodPrice }}</td>
-              <td></td>
-              <td></td>
+              <td v-if="showCategory">{{ item.sCategory }}</td>
+              <td v-if="showCategory">{{ item.count }}</td>
+              <td v-if="showCategory">{{ item.count * foodPrice }}</td>
+              <td v-if="showCategory"></td>
+              <td v-if="showCategory"></td>
             </tr>
+
             <template v-if="!chek">
               <tr>
                 <td style="width: 180px">
@@ -354,8 +369,12 @@ import TutorialDataService from "../services/TutorialDataService";
 
 //import axios from "axios";
 export default {
+  props: {
+    selectedClass: Object,
+  },
   data() {
     return {
+      showCategory: true,
       loading: false,
       period: "",
       identifier: "",
@@ -769,6 +788,17 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+
+      if (this.selectedClass.classID != "admin") {
+        this.selectedClassID = this.selectedClass;
+        this.changeClass(this.selectedClassID);
+
+        var highlightedItems = document.getElementsByName("class");
+
+        highlightedItems.forEach(function (userItem) {
+          userItem.disabled = true;
+        });
+      }
     },
     async retriveCategory() {
       TutorialDataService.getCategory()

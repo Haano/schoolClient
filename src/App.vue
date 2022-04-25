@@ -18,7 +18,7 @@
           <v-btn to="/Receipt" text> Квитанции </v-btn>
 
           <!-- <v-btn to="/CreateDate" text> Даты </v-btn> -->
-
+          <!-- v-if="selectedClass.classID === 'admin'" -->
           <div class="dropdown">
             <button
               class="btn btn-info dropdown-toggle"
@@ -30,16 +30,22 @@
               НАСТРОЙКА
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li><v-btn to="/class" text> Классы </v-btn></li>
+              <li v-if="selectedClass.classID === 'admin'">
+                <v-btn to="/class" text> Классы </v-btn>
+              </li>
               <!-- <li><a class="dropdown-item" href="/">Другое действие</a></li> -->
               <li><v-btn to="/CreateStudent" text> Ученики </v-btn></li>
-              <li>
+              <li v-if="selectedClass.classID === 'admin'">
                 <v-btn to="/Categories" text> Категории и причины </v-btn>
               </li>
             </ul>
           </div>
 
           <v-btn class="btn btn-danger" @click="del" to="/" text> ВЫХОД </v-btn>
+
+          <div style="padding-left: 20px">
+            Вход выполнен для класса: {{ selectedClass.className }}
+          </div>
           <!-- <v-btn to="/tutorials" text> Tutorials </v-btn>
       <v-btn to="/add" text> Add </v-btn> -->
         </navbar>
@@ -47,7 +53,7 @@
     </div>
     <v-main>
       <button @click="checked()">CHECK</button>
-      <router-view />
+      <router-view @example="methodName" :selectedClass="selectedClass" />
     </v-main>
   </v-app>
 </template>
@@ -58,27 +64,40 @@ export default {
   data: function () {
     return {
       router: this.$router.currentRoute.name,
+      localStorage: localStorage,
       check: false,
+      selectedClass: {},
     };
   },
   methods: {
     checked() {
-      console.log(localStorage);
+      console.log(localStorage.user);
       //this.check = !this.check;
+
+      // this.$emit("selectedClassID", this.selectedClass);
+      console.log(this.selectedClass);
     },
 
+    methodName(variable) {
+      console.log(variable, 4142141242);
+      this.selectedClass = variable;
+    },
     del() {
       localStorage.clear();
     },
   },
+  mounted() {
+    console.log(this.selectedClass.className, "this.selectedClass");
+    if (this.selectedClass.className === undefined) {
+      localStorage.clear();
+      this.$router.push("/login");
+    }
+  },
   watch: {
     "$route.query": {
       handler: function () {
-        // здесь код
-        console.log("123123");
         if (this.$router.currentRoute.name !== "login") {
           this.check = true;
-          console.log("123123OKKK");
         } else {
           this.check = false;
         }

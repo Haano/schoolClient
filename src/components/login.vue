@@ -2,16 +2,20 @@
   <div>
     <h2>Вход в систему ACT</h2>
     <div style="width: 200px">
-      <!-- Класс
-    <select
-      class="form-select"
-      v-model="selectedClassID"
-      @change="show(selectedClassID)"
-    >
-      <option v-for="user in sClass" :key="user.className" v-bind:value="user">
-        {{ user.className }}
-      </option>
-    </select> -->
+      Класс
+      <select
+        class="form-select"
+        v-model="selectedClassID"
+        @change="changeClass(selectedClassID)"
+      >
+        <option
+          v-for="user in classList"
+          :key="user.className"
+          v-bind:value="user"
+        >
+          {{ user.className }}
+        </option>
+      </select>
 
       Пароль
       <input type="text" class="form-control" v-model="password" />
@@ -38,24 +42,66 @@
 </template>
 
 <script>
+import ServerCommandLogin from "../services/ServerCommandLogin";
+
 export default {
   data: function () {
-    return { password: "" };
+    return {
+      classList: [],
+      selectedClassID: "",
+      password: "",
+      selectedClass: {},
+    };
   },
   methods: {
     del() {
       localStorage.clear();
     },
+
+    async getClassList() {
+      await ServerCommandLogin.getAllCLass().then((res) => {
+        let admin = {
+          className: "АДМИНИСТРАТОР",
+          classID: "admin",
+        };
+        this.classList = res.data.map(this.getDisplayClass);
+        this.classList.push(admin);
+        console.log(res, this.classList);
+      });
+    },
+    changeClass(data) {
+      console.log(data);
+      this.$emit("example", this.selectedClassID);
+    },
+
+    getDisplayClass(data) {
+      return {
+        classID: data._id,
+        className: data.className,
+      };
+    },
   },
   mounted() {
     this.del();
+    this.getClassList();
   },
   watch: {
     password: function () {
-      if (this.password === "1") {
+      if (
+        this.selectedClassID.className != "АДМИНИСТРАТОР" &&
+        this.password === "1"
+      ) {
         console.log("OK");
         localStorage.setItem("user", 1);
 
+        this.$router.push("/dashboard");
+      }
+      if (
+        this.selectedClassID.className === "АДМИНИСТРАТОР" &&
+        this.password === "01091867"
+      ) {
+        console.log("вход под администратором");
+        localStorage.setItem("user", 2);
         this.$router.push("/dashboard");
       }
     },
