@@ -34,7 +34,11 @@
               Обновить
             </button>
 
-            <button @click="printStat()" class="btn btn-secondary">
+            <button
+              target="_blank"
+              @click="newPrintStat()"
+              class="btn btn-secondary"
+            >
               Печать
             </button>
           </div>
@@ -333,7 +337,7 @@ export default {
       await this.findAllStudents(); // получить всех учеников (students)
       await this.defineTileColorClass(); //покрасить плитки в нужный цвет
       await this.countStat();
-      // this.changeGlobalOption(this.globalOption);
+      this.changeGlobalOption(this.globalOption);
     },
 
     clearFullData() {
@@ -363,9 +367,9 @@ export default {
       this.selectedStudentID = "";
 
       this.classList = this.classList.filter(
-        (ID) => ID === this.selectedClassID
+        (ID) => ID === this.selectedClassID,
       );
-      console.log("@@@@@@@@@@@@@@", this.classList);
+      // console.log("@@@@@@@@@@@@@@", this.classList);
 
       this.changeGlobalOption(this.globalOption);
       for (let i = 0; i < this.studentsList.length; i++) {
@@ -475,11 +479,12 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.marksPrint", this.marksPrint);
       console.log("this.classList", this.classList);
+      console.log("this.classListAll", this.classListAll);
       console.log("this.studentsList", this.studentsList);
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
       );
     },
     async getFullNameStudents() {
@@ -492,12 +497,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName
+              this.studentsList[i].FirstName,
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName
+              this.studentsList[i].LastName,
             );
             change = true;
             console.log(" BREAK j", j);
@@ -609,6 +614,8 @@ export default {
       //
       //$("# dataReportBox").prepend(topdiv); // Вставляем вновь созданный узел div в верхнюю часть содержимого контейнера dataReportBox
       let data = this.sDates.date;
+
+      let auth = localStorage.getItem("user");
       if (this.globalOption === "Отсутвующие") {
         // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
         let top =
@@ -618,10 +625,19 @@ export default {
 
         printHtml2 += printHtml;
         top += printHtml2;
-        window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
 
-        window.print(); // Вызов метода печати
-        window.location.reload(); // Страница перезагружается после печати
+        let tab = window.open("");
+        tab.document.write(top);
+        // tab.document.close();
+        //window.location.href=url;
+
+        // window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
+
+        tab.print(); // Вызов метода печати
+
+        localStorage.setItem("user", auth);
+        // window.location.reload(); // Страница перезагружается после печати
+        this.$router.push({ name: "Statistic" });
       } else {
         // Получаем ссылку на элемент в который мы хотим добавить новый элемент ul-stat
         let top = "<h2> МБОУ СОШ №24</h2> <h3>Питание на " + data + "</h3>";
@@ -630,11 +646,51 @@ export default {
 
         printHtml2 += printHtml;
         top += printHtml2;
-        window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
 
-        window.print(); // Вызов метода печати
-        window.location.reload(); // Страница перезагружается после печати
+        let tab = window.open("");
+        tab.document.write(top);
+
+        //  window.document.body.innerHTML = top; // Присваиваем напечатанное содержимое содержимому страницы
+
+        //window.print(); // Вызов метода печати
+        //window.location.reload(); // Страница перезагружается после печати
+        //  this.$router.push({ name: "Dashboard" });
+        localStorage.setItem("user", auth);
+        this.$router.push({ name: "Statistic" });
       }
+    },
+
+    newPrintStat() {
+      let auth = localStorage.getItem("user");
+      let data = this.sDates.date;
+      let script =
+        "<script type='text/javascript'>function yourFunction(){console.log('112')}";
+      let scriptEnd = "/script>";
+      let top =
+        "<head>" +
+        script +
+        "<" +
+        scriptEnd +
+        "</head><body onload='alert(1)'><h2> МБОУ СОШ №24</h2> <h3>Отсутствующие на " +
+        data +
+        "</h3>";
+      let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
+      let printHtml2 = document.getElementById("ul-stat").innerHTML;
+
+      let style =
+        "<style type='text/css'>table {border: 1px solid black; border-collapse: collapse;}  th,td { padding: 2px;border: 1px solid black; } </style> ";
+
+      let sc =
+        "<script  type='text/javascript'>window.addEventListener('DOMContentLoaded', (event) => {console.log('DOM fully loaded and parsed');});";
+      printHtml2 += printHtml;
+      top += printHtml2;
+      top += style;
+      top += sc;
+      console.log(top);
+      let tab = window.open("");
+      tab.document.write(top);
+      tab.document.print();
+      localStorage.setItem("user", auth);
     },
 
     async changeGlobalOption(globalOption) {
@@ -713,7 +769,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1
+              this.classListAll[j].count + 1,
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -724,12 +780,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i]
+                  arrayCat[i],
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1
+                  this.sCategory[i].count + 1,
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -746,7 +802,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count
+          this.sCategory[i].count,
         );
       }
 

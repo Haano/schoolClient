@@ -18,7 +18,7 @@
       </select>
 
       Пароль
-      <input type="text" class="form-control" v-model="password" />
+      <input type="password" class="form-control" v-model="password" />
 
       <!-- <button @click="del">DELETE</button> -->
     </div>

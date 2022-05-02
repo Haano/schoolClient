@@ -245,7 +245,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         }
         // if (this.sClassInput[i].count) {
@@ -280,7 +280,7 @@ export default {
       for (i = 0; i < this.sClassInput.length; i++) {
         // let but = document.getElementById(this.sClassInput[i]._id + "update");
         document.getElementById(
-          this.sClassInput[i]._id + "update"
+          this.sClassInput[i]._id + "update",
         ).disabled = false;
         // document
         //   .getElementById(this.sClassInput[i]._id + "update")
@@ -308,7 +308,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         } else {
           this.sClassInput[i].count = false;
@@ -329,7 +329,7 @@ export default {
             toDay === this.marks[i].date.slice(0, 10)
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update"
+              this.marks[i].studentID + "update",
             ).disabled = false;
 
             // let but = document.getElementById(
@@ -337,9 +337,7 @@ export default {
             // );
             // but.remove();
           } else {
-            document.getElementById(
-              this.marks[i].studentID + "update"
-            ).disabled = true;
+            document.getElementById(this.marks[i].studentID).disabled = true;
             document
               .getElementById(this.marks[i].studentID + "update")
               .remove();
@@ -364,7 +362,7 @@ export default {
               a.name = "";
             } else {
               a.name = a.options[j].text;
-              a.disabled = true;
+              // a.disabled = true;
             }
           }
 
@@ -430,6 +428,9 @@ export default {
         });
 
       document.getElementById(data._id + "update").disabled = true;
+
+      document.getElementById(data._id).disabled = true;
+      document.getElementById(data._id + "update").remove();
     },
 
     send() {
