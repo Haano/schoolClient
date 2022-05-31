@@ -28,8 +28,14 @@
           v-model="sDates.date"
           @change="show()"
         />
-        <div v-if="selectedClassID">
+        <div
+          v-if="
+            selectedClassID &&
+            sDates.date === new Date().toISOString().slice(0, 10)
+          "
+        >
           <br />
+
           <button @click="loadLastDay()" id="loadLast" class="btn btn-success">
             Загрузить значения прошлого дня
           </button>
@@ -52,7 +58,7 @@
         </div>
       </div>
       <div>
-        <div v-if="marks.length == 0">
+        <div v-if="!checkSendData">
           <button
             id="sendData"
             class="btn btn-primary"
@@ -138,6 +144,7 @@ export default {
   },
   data() {
     return {
+      checkSendData: false,
       countMark: [],
       sClass: [{ className: "123", classID: "sadasd" }],
       sClassInput: [],
@@ -207,11 +214,20 @@ export default {
       data = date.toISOString().slice(0, 10);
       var test = this.findMarksThis(date.toISOString().slice(0, 10));
       await this.pow(3, data, test, data2);
-      let bottomHidden = document.querySelectorAll("#update");
+      // let bottomHidden = document.querySelectorAll("#update");
 
-      for (var i = 0; i < bottomHidden.length; i++) {
-        bottomHidden[i].hidden = true;
-      }
+      // for (let i = 0; i < bottomHidden.length; i++) {
+      //   bottomHidden[i].hidden = true;
+      // }
+      // if (this.sDates.date === new Date().toISOString().slice(0, 10)) {
+      //   for (let i = 0; i < this.marks.length; i++) {
+      //     // document.getElementById(this.marks[i]._id).disabled = false;
+      //     console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
+      //     document.getElementById(this.marks[i].studentID).disabled = false;
+      //     console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
+      //   }
+      // }
+      this.checkSendData = 0;
     },
 
     countMarks(id, mark) {
@@ -320,9 +336,9 @@ export default {
       let toDay = new Date().toISOString().slice(0, 10);
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
       if (this.marks.length > 0) {
-        document.getElementById("loadLast").disabled = true;
-        document.getElementById("sendData").disabled = true;
-
+        // document.getElementById("loadLast").disabled = true;
+        // document.getElementById("sendData").disabled = true;
+        this.checkSendData = true;
         for (i = 0; i < this.marks.length; i++) {
           if (
             this.marks[i].change &&
@@ -344,6 +360,7 @@ export default {
           }
         }
       } else {
+        this.checkSendData = false;
         document.getElementById("loadLast").disabled = false;
         document.getElementById("sendData").disabled = false;
       }
@@ -479,6 +496,7 @@ export default {
     },
 
     show(data) {
+      this.checkSendData = true;
       this.sClassInput = [];
       data = this.selectedClassID;
       console.log(data);
