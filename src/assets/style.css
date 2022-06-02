@@ -17,23 +17,22 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 0 1%;
-  margin: 0px 5px 0px 5px;
+  margin: 0px 2px 0px 2px;
 }
 
 .ul-stat li {
   display: flex;
-  padding: 5px;
+  padding: 2px;
   flex-wrap: wrap;
 }
 
 .flex {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   align-content: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0 1%;
   margin: 0 0px 0px 0px;
 }
 

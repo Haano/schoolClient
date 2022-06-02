@@ -52,7 +52,7 @@
       </div>
     </div>
     <v-main>
-      <button @click="checked()">CHECK</button>
+      <!-- <button @click="checked()">CHECK</button> -->
       <router-view @example="methodName" :selectedClass="selectedClass" />
     </v-main>
   </v-app>

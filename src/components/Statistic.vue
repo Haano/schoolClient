@@ -1,170 +1,126 @@
 <template>
-  <div>
-    <div class="class-marks">
-      <div class="class-mark">
-        <div class="class-mark-change">
-          <div>
-            Сформировать отчет на:
-            <select
-              name=""
-              v-model="globalOption"
-              class="form-select"
-              id=""
-              @change="changeGlobalOption(globalOption)"
-            >
-              <option>Отсутствующие</option>
-              <option>Питание</option>
-              <option>Питание 1 смена</option>
-              <option>Питание 2 смена</option>
-            </select>
-          </div>
-          <div>
-            <input
-              type="date"
-              id="Date"
-              class="form-control"
-              required
-              v-model="sDates.date"
-              @change="initialization()"
-            />
-          </div>
-
-          <div>
-            <button @click="initialization()" class="btn btn-success">
-              Обновить
-            </button>
-
-            <button
-              target="_blank"
-              @click="newPrintStat()"
-              class="btn btn-secondary"
-            >
-              Печать
-            </button>
-          </div>
-
+  <div class="main-stat">
+    <div>
+      <div class="class-marks">
+        <div class="class-mark">
           <div class="class-mark-change">
-            <b> Загрузить по диапазону</b>
-            <div class="flex-food-main">
-              <div class="flex-food-main">
-                <div style="width: 30px; padding-top: 6px">От</div>
-                <div class="flex" style="width: 220px">
-                  <input
-                    type="date"
-                    v-model="dateFrom"
-                    id="DateFrom"
-                    required
-                    class="form-control"
-                  />
-                </div>
-              </div>
-              <div class="flex-food-main">
-                <div style="width: 30px; padding-top: 6px">До</div>
-                <div class="flex" style="width: 220px">
-                  <input
-                    type="date"
-                    v-model="dateBefore"
-                    id="DateBefore"
-                    required
-                    class="form-control"
-                  />
-                </div>
-              </div>
-              <div class="flex-food-main">
-                <div
-                  class="flex-food"
-                  style="width: 100px; padding: 2px 0 0 5px"
-                >
-                  <button
-                    @click="initializationByRange()"
-                    class="btn btn-success"
-                  >
-                    Загрузить
-                  </button>
-                </div>
-              </div>
+            <div>
+              Сформировать отчет на:
+              <select
+                name=""
+                v-model="globalOption"
+                class="form-select"
+                id=""
+                @change="changeGlobalOption(globalOption)"
+              >
+                <option>Отсутствующие</option>
+                <option>Питание</option>
+                <option>Питание 1 смена</option>
+                <option>Питание 2 смена</option>
+              </select>
             </div>
-          </div>
+            <div>
+              <input
+                type="date"
+                id="Date"
+                class="form-control"
+                required
+                v-model="sDates.date"
+                @change="initialization()"
+              />
+            </div>
 
-          <div class="flex-food">
-            <div style="display: flex; align-items: stretch">
-              <div>
-                <b> Класс</b>
-                <select class="form-select" v-model="selectedClassID">
-                  <option
-                    v-for="user in classList"
-                    :key="user.className"
-                    v-bind:value="user"
-                  >
-                    {{ user.className }}
-                  </option>
-                </select>
-              </div>
-              <div style="width: 200px">
-                <b>Ученик</b>
-                <select class="form-select" v-model="selectedStudentID">
-                  <option
-                    v-for="user in studentsListByClassID"
-                    :key="user._id"
-                    v-bind:value="user"
-                  >
-                    {{ user.FirstName }} {{ user.LastName }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div class="flex-food">
-              <button @click="initializationByClass()" class="btn btn-success">
-                Загрузить
+            <div>
+              <button @click="initialization()" class="btn btn-success">
+                Обновить
+              </button>
+
+              <button
+                target="_blank"
+                @click="newPrintStat()"
+                class="btn btn-secondary"
+              >
+                Печать
               </button>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div>
-        <div class="class-mark">
-          <ul id="ul-stat">
-            <li>
-              Всего учеников:
-              <b style="padding: 0 5px 0 5px">
-                {{ studentsList.length }} (на
-                {{ new Date().toLocaleDateString() }})</b
-              >
-            </li>
+            <div class="class-mark-change">
+              <b> Загрузить по диапазону</b>
+              <div class="flex-food-main">
+                <div class="flex-food-main">
+                  <div style="width: 30px; padding-top: 6px">От</div>
+                  <div class="flex" style="width: 220px">
+                    <input
+                      type="date"
+                      v-model="dateFrom"
+                      id="DateFrom"
+                      required
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+                <div class="flex-food-main">
+                  <div style="width: 30px; padding-top: 6px">До</div>
+                  <div class="flex" style="width: 220px">
+                    <input
+                      type="date"
+                      v-model="dateBefore"
+                      id="DateBefore"
+                      required
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+                <div class="flex-food-main">
+                  <div
+                    class="flex-food"
+                    style="width: 100px; padding: 2px 0 0 5px"
+                  >
+                    <button
+                      @click="initializationByRange()"
+                      class="btn btn-success"
+                    >
+                      Загрузить
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <li>Данные отправлены на: {{ marks.length }}</li>
-            <li>
-              Отсутствует: {{ marksPrint.length }} ({{
-                reversedMessage(marksPrint.length)
-              }}%)
-            </li>
-            <li v-for="caus in countAll" :key="caus.causes">
-              {{ caus.causes }} = {{ caus.count }} ({{
-                reversedMessage(caus.count)
-              }}%)
-            </li>
-          </ul>
-        </div>
-        <button @click="help()" class="btn btn-warning">Помощь</button>
-      </div>
-      <div>
-        <div>
-          <div class="class-mark">
-            <section class="class-mark-shift">
-              <header>1 смена</header>
-            </section>
-
-            <div v-for="value in classList" :key="value.className">
-              <div
-                v-if="value.shift === '1 смена'"
-                :class="{
-                  'class-mark-item-change': value.change,
-                  'class-mark-item-BAD': !value.created,
-                  'class-mark-item-ok': value.created,
-                }"
-              >
-                {{ value.className }}
+            <div class="flex-food">
+              <div style="display: flex; align-items: stretch">
+                <div>
+                  <b> Класс</b>
+                  <select class="form-select" v-model="selectedClassID">
+                    <option
+                      v-for="user in classList"
+                      :key="user.className"
+                      v-bind:value="user"
+                    >
+                      {{ user.className }}
+                    </option>
+                  </select>
+                </div>
+                <div style="width: 200px">
+                  <b>Ученик</b>
+                  <select class="form-select" v-model="selectedStudentID">
+                    <option
+                      v-for="user in studentsListByClassID"
+                      :key="user._id"
+                      v-bind:value="user"
+                    >
+                      {{ user.FirstName }} {{ user.LastName }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="flex-food">
+                <button
+                  @click="initializationByClass()"
+                  class="btn btn-success"
+                >
+                  Загрузить
+                </button>
               </div>
             </div>
           </div>
@@ -172,64 +128,114 @@
 
         <div>
           <div class="class-mark">
-            <section class="class-mark-shift">
-              <header>2 смена</header>
-            </section>
+            <ul id="ul-stat">
+              <li>
+                Всего учеников:
+                <b style="padding: 0 5px 0 5px">
+                  {{ studentsList.length }} (на
+                  {{ new Date().toLocaleDateString() }})</b
+                >
+              </li>
 
-            <div v-for="value in classList" :key="value.className">
-              <div
-                v-if="value.shift === '2 смена'"
-                :class="{
-                  'class-mark-item-change': value.change,
-                  'class-mark-item-BAD': !value.created,
-                  'class-mark-item-ok': value.created,
-                }"
-              >
-                {{ value.className }}
+              <li>Данные отправлены на: {{ marks.length }}</li>
+              <li>
+                Отсутствует: {{ marksPrint.length }} ({{
+                  reversedMessage(marksPrint.length)
+                }}%)
+              </li>
+              <li v-for="caus in countAll" :key="caus.causes">
+                {{ caus.causes }} = {{ caus.count }} ({{
+                  reversedMessage(caus.count)
+                }}%)
+              </li>
+            </ul>
+          </div>
+          <button @click="help()" class="btn btn-warning">Помощь</button>
+        </div>
+
+        <div>
+          <div>
+            <div class="class-mark">
+              <section class="class-mark-shift">
+                <header>1 смена</header>
+              </section>
+
+              <div v-for="value in classList" :key="value.className">
+                <div
+                  v-if="value.shift === '1 смена'"
+                  :class="{
+                    'class-mark-item-change': value.change,
+                    'class-mark-item-BAD': !value.created,
+                    'class-mark-item-ok': value.created,
+                  }"
+                >
+                  {{ value.className }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="class-mark">
+              <section class="class-mark-shift">
+                <header>2 смена</header>
+              </section>
+
+              <div v-for="value in classList" :key="value.className">
+                <div
+                  v-if="value.shift === '2 смена'"
+                  :class="{
+                    'class-mark-item-change': value.change,
+                    'class-mark-item-BAD': !value.created,
+                    'class-mark-item-ok': value.created,
+                  }"
+                >
+                  {{ value.className }}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="globalOption === 'Отсутствующие'">
-      <div class="myTable">
-        <v-col>
+      <div v-if="globalOption === 'Отсутствующие'">
+        <div class="myTable">
+          <v-col>
+            <v-data-table
+              :headers="headers"
+              :items="this.marksPrint"
+              :items-per-page="3000"
+              hide-default-footer
+              id="table"
+            >
+              <template v-slot:[`item.index`]="{ index }">
+                {{ index + 1 }}
+              </template>
+            </v-data-table>
+          </v-col>
+        </div>
+      </div>
+
+      <div
+        v-if="
+          globalOption === 'Питание' ||
+          globalOption === 'Питание 1 смена' ||
+          globalOption === 'Питание 2 смена'
+        "
+        class="myTable"
+      >
+        <!-- fixed-header
+        height="40vh" -->
+        <div class="myTable">
           <v-data-table
-            :headers="headers"
-            :items="this.marksPrint"
+            :headers="headersEat"
+            :items="this.classListAll"
             :items-per-page="3000"
             hide-default-footer
             id="table"
           >
-            <template v-slot:[`item.index`]="{ index }">
-              {{ index + 1 }}
-            </template>
           </v-data-table>
-        </v-col>
-      </div>
-    </div>
-
-    <div
-      v-if="
-        globalOption === 'Питание' ||
-        globalOption === 'Питание 1 смена' ||
-        globalOption === 'Питание 2 смена'
-      "
-      class="myTable"
-    >
-      <!-- fixed-header
-        height="40vh" -->
-      <div class="myTable">
-        <v-data-table
-          :headers="headersEat"
-          :items="this.classListAll"
-          :items-per-page="3000"
-          hide-default-footer
-          id="table"
-        >
-        </v-data-table>
+        </div>
       </div>
     </div>
   </div>
@@ -367,7 +373,7 @@ export default {
       this.selectedStudentID = "";
 
       this.classList = this.classList.filter(
-        (ID) => ID === this.selectedClassID,
+        (ID) => ID === this.selectedClassID
       );
       // console.log("@@@@@@@@@@@@@@", this.classList);
 
@@ -484,7 +490,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
       );
     },
     async getFullNameStudents() {
@@ -497,12 +503,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName,
+              this.studentsList[i].FirstName
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName,
+              this.studentsList[i].LastName
             );
             change = true;
             console.log(" BREAK j", j);
@@ -769,7 +775,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1,
+              this.classListAll[j].count + 1
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -780,12 +786,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i],
+                  arrayCat[i]
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1,
+                  this.sCategory[i].count + 1
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -802,7 +808,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count,
+          this.sCategory[i].count
         );
       }
 
@@ -856,13 +862,20 @@ export default {
   justify-content: space-around;
   flex-direction: row;
 }
+.main-stat {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
 .class-marks {
   text-align: center;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  justify-content: center;
+
   margin: 1px;
+  justify-content: start;
+  column-gap: none;
 }
 
 .class-mark {

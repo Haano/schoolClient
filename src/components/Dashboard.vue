@@ -1,9 +1,8 @@
 <template>
   <div>
-    <button @click="check()">ПРОВЕРКА</button>
+    <!-- <button @click="check()">ПРОВЕРКА</button> -->
     <div class="flex">
-      <div>
-        <br />
+      <div class="dashboard-main">
         Класс
         <select
           class="form-select"
@@ -34,14 +33,17 @@
             sDates.date === new Date().toISOString().slice(0, 10)
           "
         >
-          <br />
-
-          <button @click="loadLastDay()" id="loadLast" class="btn btn-success">
+          <button
+            @click="loadLastDay()"
+            id="loadLast"
+            class="btn btn-success"
+            style="margin-top: 10px; margin-left: auto; margin-right: auto"
+          >
             Загрузить значения прошлого дня
           </button>
         </div>
       </div>
-      <div>
+      <div class="dashboard-main">
         <div class="flex-ul">
           <ul>
             <li v-for="caus in causesDefault" :key="caus.causes">
@@ -56,28 +58,28 @@
             </li>
           </ul>
         </div>
-      </div>
-      <div>
-        <div v-if="!checkSendData">
-          <button
-            id="sendData"
-            class="btn btn-primary"
-            @click="send()"
-            color="primary"
-          >
-            ОТПРАВИТЬ ДАННЫЕ
-          </button>
-        </div>
+        <div>
+          <div v-if="!checkSendData">
+            <button
+              id="sendData"
+              class="btn btn-primary"
+              @click="send()"
+              color="primary"
+            >
+              ОТПРАВИТЬ ДАННЫЕ
+            </button>
+          </div>
 
-        <div v-else>
-          <button
-            id="sendData"
-            class="btn btn-danger"
-            color="primary"
-            disabled="true"
-          >
-            Данные были отправлены
-          </button>
+          <div v-else>
+            <button
+              id="sendData"
+              class="btn btn-danger"
+              color="primary"
+              disabled="true"
+            >
+              Данные были отправлены
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -131,8 +133,16 @@
   </div>
 </template>
 
-<style>
+<style scoped lang="scss">
 @import "../assets/style.css";
+
+.dashboard-main {
+  // width: 630px;
+  border-radius: 3px;
+  box-shadow: 0 0 3px #4d4d4d;
+  padding: 10px 10px 10px 10px;
+  margin: 15px 10px 15px 15px;
+}
 </style>
 
 <script>
@@ -261,7 +271,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         }
         // if (this.sClassInput[i].count) {
@@ -296,7 +306,7 @@ export default {
       for (i = 0; i < this.sClassInput.length; i++) {
         // let but = document.getElementById(this.sClassInput[i]._id + "update");
         document.getElementById(
-          this.sClassInput[i]._id + "update",
+          this.sClassInput[i]._id + "update"
         ).disabled = false;
         // document
         //   .getElementById(this.sClassInput[i]._id + "update")
@@ -324,7 +334,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         } else {
           this.sClassInput[i].count = false;
@@ -345,7 +355,7 @@ export default {
             toDay === this.marks[i].date.slice(0, 10)
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update",
+              this.marks[i].studentID + "update"
             ).disabled = false;
 
             // let but = document.getElementById(
