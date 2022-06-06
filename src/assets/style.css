@@ -1,200 +1,241 @@
 .select {
-  width: 100%;
+    width: 100%;
 }
 
 .select-flex {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: left;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
 }
 
 .ul-stat {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0 1%;
-  margin: 0px 2px 0px 2px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 1%;
+    margin: 0px 2px 0px 2px;
 }
 
 .ul-stat li {
-  display: flex;
-  padding: 2px;
-  flex-wrap: wrap;
+    display: flex;
+    padding: 2px;
+    flex-wrap: wrap;
 }
 
 .flex {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  align-content: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin: 0 0px 0px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 0px 0px 0px;
 }
 
 .flex:only-child {
-  margin: 200px 200px 200px 200px;
+    margin: 200px 200px 200px 200px;
 }
 
 .flex-bottom {
-  padding-top: 2px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+    padding-top: 2px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .flex-input {
-  padding-top: 2px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    padding-top: 2px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .flex li {
-  text-align: center;
-  display: flex;
-  padding-bottom: 0px;
+    text-align: center;
+    display: flex;
+    padding-bottom: 0px;
 }
 
 .flex button {
-  text-align: center;
-  display: flex;
-  margin-bottom: 20px;
-  margin-left: 20px;
+    text-align: center;
+    display: flex;
+    margin-bottom: 20px;
+    margin-left: 20px;
 }
 
 .myTable {
-  display: flex;
-  max-width: 1000px;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
+    display: flex;
+    max-width: 1000px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .myTable div {
-  text-align: center;
+    text-align: center;
 }
 
 tbody tr:nth-of-type(even) {
-  background-color: rgb(245, 245, 245);
+    background-color: rgb(245, 245, 245);
 }
 
 tbody tr:nth-of-type(odd) {
-  background-color: rgb(255, 255, 255);
-  color: rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
 }
 
 .v-data-table-header {
-  background-color: rgb(79, 80, 148);
+    background-color: rgb(79, 80, 148);
 }
 
 .v-data-table-header span {
-  color: rgb(255, 255, 255);
-  font-size: 16px;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
 }
 
 .v-data-footer {
-  background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
 }
 
 .text-start {
-  border: 1px solid grey;
+    border: 1px solid grey;
 }
 
 navbar {
-  border: 1px solid grey;
-  background-color: rgb(204, 204, 204);
+    border: 1px solid grey;
+    background-color: rgb(204, 204, 204);
 }
 
 .flex2 {
-  padding-top: 2%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  height: 150%;
+    padding-top: 2%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 150%;
 }
 
 .cat {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .cat div {
-  /* width: 400px; */
-  margin: 0px 0px 0px 0px;
+    /* width: 400px; */
+    margin: 0px 0px 0px 0px;
 }
 
 .cat-item {
-  display: flex;
-  flex-direction: column;
-  /* flex-basis: 200px; */
-  width: auto;
-  margin: 0px 20px 0px 0px;
-  padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    /* flex-basis: 200px; */
+    width: auto;
+    margin: 0px 20px 0px 0px;
+    padding: 10px 10px;
 }
 
 .cat-item button {
-  margin: 10px 0px;
+    margin: 10px 0px;
 }
 
 .flex-food-main {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .flex-food {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.flex-food > div {
-  justify-content: center;
-  flex-direction: inherit;
-  align-items: center;
-  width: 300px;
-  padding: 0px 5px 2px;
-  flex-wrap: wrap;
+.flex-food>div {
+    justify-content: center;
+    flex-direction: inherit;
+    align-items: center;
+    width: 300px;
+    padding: 0px 5px 2px;
+    flex-wrap: wrap;
 }
 
 .reciept-table {
-  margin: auto;
-  /* margin-left: 5px;
+    margin: auto;
+    /* margin-left: 5px;
   padding-left: 5px; */
-  /* border-left-color: #b4b4b4; */
-  /* Цвет линии слева */
-  /* border-left-style: dotted; */
-  /* Стиль линии */
-  /* border-left-width: 3px; */
-  /* Толщина линии */
+    /* border-left-color: #b4b4b4; */
+    /* Цвет линии слева */
+    /* border-left-style: dotted; */
+    /* Стиль линии */
+    /* border-left-width: 3px; */
+    /* Толщина линии */
 }
 
 .reciept-table TD,
 TH {
-  padding: 2px;
-  /* Поля вокруг содержимого таблицы */
-  border: 0.2px solid black;
-  /* Параметры рамки */
+    padding: 2px;
+    /* Поля вокруг содержимого таблицы */
+    border: 0.2px solid black;
+    /* Параметры рамки */
 }
 
 .reciept-table TH {
-  background: #b0e0e6;
-  /* Цвет фона */
+    background: #b0e0e6;
+    /* Цвет фона */
 }
 
 .reciept {
-  width: 630px;
-  border-radius: 3px;
-  box-shadow: 0 0 3px #4d4d4d;
-  padding: 15px 15px;
-  margin: 0px 10px 15px 15px;
+    width: 630px;
+    border-radius: 3px;
+    box-shadow: 0 0 3px #4d4d4d;
+    padding: 15px 15px;
+    margin: 0px 10px 15px 15px;
+}
+
+.component-fade-enter-active,
+.component-fade-leave-active {
+    transition: opacity 0.3s ease;
+    transition: all 0.2s ease-out;
+}
+
+.component-fade-enter,
+.component-fade-leave-to
+/* .component-fade-leave-active до версии 2.1.8 */
+
+{
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+.list-enter-active,
+.list-leave-active {
+    transform: translateY(10px);
+    animation: bounce-in 0.7s;
+}
+
+.list-enter,
+.list-leave-to
+/* .list-leave-active до версии 2.1.8 */
+
+{
+    animation: bounce-in 0.7s reverse;
+}
+
+@keyframes bounce-in {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

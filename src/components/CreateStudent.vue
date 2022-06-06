@@ -1,8 +1,7 @@
 <template>
-  <div class="cat">
-    <div>
+  <div class="cat-student">
+    <div class="class-student">
       <div>
-        <br />
         Класс
         <select
           class="form-select light"
@@ -22,19 +21,6 @@
           >Выбрано: {{ selectedClassID.classID }}
           {{ selectedClassID.className }}</span
         >
-      </div>
-
-      <div>
-        Категория
-        <select class="form-select" v-model="Category">
-          <option
-            v-for="cat in sCategory"
-            :key="cat.Category"
-            v-bind:value="cat.Category"
-          >
-            {{ cat.Category }}
-          </option>
-        </select>
       </div>
 
       <div class="submit-form mt-3 mx-auto">
@@ -75,15 +61,17 @@
               v-model="ReceiptDate"
             />
           </div>
-          <div class="form-group">
-            <label for="classLider">Категория</label>
-            <input
-              type="text"
-              class="form-control"
-              required
-              v-model="Category"
-            />
-          </div>
+
+          Категория
+          <select class="form-select" v-model="Category">
+            <option
+              v-for="cat in sCategory"
+              :key="cat.Category"
+              v-bind:value="cat.Category"
+            >
+              {{ cat.Category }}
+            </option>
+          </select>
         </div>
         <br />
         <button @click="createStudent" class="btn btn-success">
@@ -144,7 +132,23 @@
 </template>
 
 <style>
-@import "../assets/style.css";
+.cat-student {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.class-student {
+  padding: 5px 10px 10px 10px;
+  text-align: center;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  border-radius: 3px;
+  box-shadow: 0 0 3px #4d4d4d;
+  margin-top: 10px;
+}
 </style>
 <script>
 import TutorialDataService from "../services/TutorialDataService";

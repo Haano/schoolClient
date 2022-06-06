@@ -51,13 +51,16 @@
               = {{ caus.count }}
             </li>
           </ul>
+
           <ul>
             <li v-for="caus in causes" :key="caus.causes">
               {{ caus.causes }}
-              = {{ caus.count }}
+              =
+              {{ caus.count }}
             </li>
           </ul>
         </div>
+
         <div>
           <transition name="fade" mode="out-in">
             <div v-if="!checkSendData">
@@ -96,6 +99,7 @@
           <template v-slot:[`item.index`]="{ index }">
             {{ index + 1 }}
           </template>
+
           <template v-slot:[`item.date`]="{ item }">
             <div class="select-flex">
               <div class="select">
@@ -140,6 +144,18 @@
 
 <style scoped lang="scss">
 @import "../assets/style.css";
+
+.component-fade-enter-active,
+.component-fade-leave-active {
+  //transition: opacity 0.3s ease;
+
+  transition: all 0.2s ease-out;
+}
+.component-fade-enter, .component-fade-leave-to
+/* .component-fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(100px);
+}
 
 .dashboard-main {
   // width: 630px;
@@ -268,7 +284,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         }
         // if (this.sClassInput[i].count) {
@@ -303,7 +319,7 @@ export default {
       for (i = 0; i < this.sClassInput.length; i++) {
         // let but = document.getElementById(this.sClassInput[i]._id + "update");
         document.getElementById(
-          this.sClassInput[i]._id + "update"
+          this.sClassInput[i]._id + "update",
         ).disabled = false;
         // document
         //   .getElementById(this.sClassInput[i]._id + "update")
@@ -331,7 +347,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         } else {
           this.sClassInput[i].count = false;
@@ -353,11 +369,11 @@ export default {
             toDay === this.marks[i].date.slice(0, 10)
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update"
+              this.marks[i].studentID + "update",
             ).disabled = false;
           } else {
             document.getElementById(
-              this.marks[i].studentID + "update"
+              this.marks[i].studentID + "update",
             ).disabled = true;
             // document
             //   .getElementById(this.marks[i].studentID + "update")
@@ -518,7 +534,7 @@ export default {
         console.log(document.getElementById(this.marks[i]._id));
 
         document.getElementById(
-          this.marks[i].studentID + "update"
+          this.marks[i].studentID + "update",
         ).disabled = false;
       }
       document.getElementById("loadLast").disabled = true;

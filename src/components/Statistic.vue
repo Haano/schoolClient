@@ -143,12 +143,18 @@
                   reversedMessage(marksPrint.length)
                 }}%)
               </li>
-              <li v-for="caus in countAll" :key="caus.causes">
-                {{ caus.causes }} = {{ caus.count }} ({{
-                  reversedMessage(caus.count)
-                }}%)
-              </li>
             </ul>
+
+            <ul id="ul-stat">
+              <transition-group name="list">
+                <li v-for="caus in countAll" :key="caus.causes">
+                  {{ caus.causes }} = {{ caus.count }} ({{
+                    reversedMessage(caus.count)
+                  }}%)
+                </li>
+              </transition-group>
+            </ul>
+            <!-- </ul> -->
           </div>
           <button @click="help()" class="btn btn-warning">Помощь</button>
         </div>
@@ -159,19 +165,20 @@
               <section class="class-mark-shift">
                 <header>1 смена</header>
               </section>
-
-              <div v-for="value in classList" :key="value.className">
-                <div
-                  v-if="value.shift === '1 смена'"
-                  :class="{
-                    'class-mark-item-change': value.change,
-                    'class-mark-item-BAD': !value.created,
-                    'class-mark-item-ok': value.created,
-                  }"
-                >
-                  {{ value.className }}
+              <transition-group class="class-mark-noBoard" name="list">
+                <div v-for="value in classList" :key="value.className">
+                  <div
+                    v-if="value.shift === '1 смена'"
+                    :class="{
+                      'class-mark-item-change': value.change,
+                      'class-mark-item-BAD': !value.created,
+                      'class-mark-item-ok': value.created,
+                    }"
+                  >
+                    {{ value.className }}
+                  </div>
                 </div>
-              </div>
+              </transition-group>
             </div>
           </div>
 
@@ -181,62 +188,70 @@
                 <header>2 смена</header>
               </section>
 
-              <div v-for="value in classList" :key="value.className">
-                <div
-                  v-if="value.shift === '2 смена'"
-                  :class="{
-                    'class-mark-item-change': value.change,
-                    'class-mark-item-BAD': !value.created,
-                    'class-mark-item-ok': value.created,
-                  }"
-                >
-                  {{ value.className }}
+              <transition-group class="class-mark-noBoard" name="list">
+                <div v-for="value in classList" :key="value.className">
+                  <div
+                    v-if="value.shift === '2 смена'"
+                    :class="{
+                      'class-mark-item-change': value.change,
+                      'class-mark-item-BAD': !value.created,
+                      'class-mark-item-ok': value.created,
+                    }"
+                  >
+                    {{ value.className }}
+                  </div>
                 </div>
-              </div>
+              </transition-group>
             </div>
           </div>
         </div>
       </div>
-
-      <div v-if="globalOption === 'Отсутствующие'">
-        <div class="myTable">
-          <v-col>
-            <v-data-table
-              :headers="headers"
-              :items="this.marksPrint"
-              :items-per-page="3000"
-              hide-default-footer
-              id="table"
-            >
-              <template v-slot:[`item.index`]="{ index }">
-                {{ index + 1 }}
-              </template>
-            </v-data-table>
-          </v-col>
+      <transition name="component-fade" mode="out-in">
+        <div v-if="globalOption === 'Отсутствующие'">
+          <div class="myTable">
+            <v-col>
+              <v-data-table
+                :headers="headers"
+                :items="this.marksPrint"
+                :items-per-page="3000"
+                hide-default-footer
+                id="table"
+              >
+                <template v-slot:[`item.index`]="{ index }">
+                  {{ index + 1 }}
+                </template>
+              </v-data-table>
+            </v-col>
+          </div>
         </div>
-      </div>
 
-      <div
-        v-if="
-          globalOption === 'Питание' ||
-          globalOption === 'Питание 1 смена' ||
-          globalOption === 'Питание 2 смена'
-        "
-        class="myTable"
-      >
-        <!-- fixed-header
-        height="40vh" -->
-        <div class="myTable">
-          <v-data-table
-            :headers="headersEat"
-            :items="this.classListAll"
-            :items-per-page="3000"
-            hide-default-footer
-            id="table"
+        <transition name="component-fade" mode="out-in">
+          <div
+            v-if="
+              globalOption === 'Питание' ||
+              globalOption === 'Питание 1 смена' ||
+              globalOption === 'Питание 2 смена'
+            "
+            class="myTable"
           >
-          </v-data-table>
-        </div>
-      </div>
+            <!-- fixed-header
+        height="40vh" -->
+
+            <div class="myTable">
+              <transition name="list">
+                <v-data-table
+                  :headers="headersEat"
+                  :items="this.classListAll"
+                  :items-per-page="3000"
+                  hide-default-footer
+                  id="table"
+                >
+                </v-data-table>
+              </transition>
+            </div>
+          </div>
+        </transition>
+      </transition>
     </div>
   </div>
 </template>
@@ -301,8 +316,8 @@ export default {
       classList: [],
       classListOption: [],
       classListAll: [],
-      studentsList: [{ FirstName: "1", LastName: "2" }],
-      countAll: [{ causes: "21231" }],
+      studentsList: [{}],
+      countAll: [{}],
       activeClassOK: "class-mark-item-ok",
       activeClassBAD: "class-mark-item-BAD",
       activeClassChange: "class-mark-item-change",
@@ -355,7 +370,7 @@ export default {
       this.marks = [];
       this.students = [];
       this.marksPrint = [];
-      this.countAll = [{ causes: "1", count: 0 }];
+      this.countAll = [{}];
     },
 
     clearFullDataClass() {
@@ -365,7 +380,7 @@ export default {
       this.marks = [];
       this.students = [];
       this.marksPrint = [];
-      this.countAll = [{ causes: "1", count: 0 }];
+      this.countAll = [{}];
     },
 
     changeClass() {
@@ -373,7 +388,7 @@ export default {
       this.selectedStudentID = "";
 
       this.classList = this.classList.filter(
-        (ID) => ID === this.selectedClassID
+        (ID) => ID === this.selectedClassID,
       );
       // console.log("@@@@@@@@@@@@@@", this.classList);
 
@@ -490,7 +505,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
       );
     },
     async getFullNameStudents() {
@@ -503,12 +518,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName
+              this.studentsList[i].FirstName,
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName
+              this.studentsList[i].LastName,
             );
             change = true;
             console.log(" BREAK j", j);
@@ -775,7 +790,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1
+              this.classListAll[j].count + 1,
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -786,12 +801,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i]
+                  arrayCat[i],
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1
+                  this.sCategory[i].count + 1,
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -808,7 +823,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count
+          this.sCategory[i].count,
         );
       }
 
@@ -891,6 +906,19 @@ export default {
 
   margin: 5px 5px 5px 5px;
 }
+
+.class-mark-noBoard {
+  margin: 5px;
+  text-align: center;
+  width: 350px;
+  display: flex;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  margin: 5px 5px 5px 5px;
+}
+
 .class-mark-shift {
   text-align: center;
   width: 350px;

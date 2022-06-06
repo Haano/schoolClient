@@ -117,12 +117,11 @@ export default {
 .component-fade-leave-active {
   //transition: opacity 0.3s ease;
 
-  transition: all 0.36s ease-out;
-  animation-delay: 250ms;
+  transition: all 0.2s ease-out;
 }
 .component-fade-enter, .component-fade-leave-to
 /* .component-fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(100px);
 }
 </style>
