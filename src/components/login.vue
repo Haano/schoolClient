@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mainLogin">
     <h2>Вход в систему ACT</h2>
     <div style="width: 200px">
       Класс
@@ -110,6 +110,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.mainLogin {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
 .modal-shadow {
   position: absolute;
   top: 0;

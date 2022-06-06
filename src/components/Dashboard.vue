@@ -59,27 +59,29 @@
           </ul>
         </div>
         <div>
-          <div v-if="!checkSendData">
-            <button
-              id="sendData"
-              class="btn btn-primary"
-              @click="send()"
-              color="primary"
-            >
-              ОТПРАВИТЬ ДАННЫЕ
-            </button>
-          </div>
+          <transition name="fade" mode="out-in">
+            <div v-if="!checkSendData">
+              <button
+                id="sendData"
+                class="btn btn-primary"
+                @click="send()"
+                color="primary"
+              >
+                ОТПРАВИТЬ ДАННЫЕ
+              </button>
+            </div>
 
-          <div v-else>
-            <button
-              id="sendData"
-              class="btn btn-danger"
-              color="primary"
-              disabled="true"
-            >
-              Данные были отправлены
-            </button>
-          </div>
+            <div v-else>
+              <button
+                id="sendData"
+                class="btn btn-danger"
+                color="primary"
+                disabled="true"
+              >
+                Данные были отправлены
+              </button>
+            </div>
+          </transition>
         </div>
       </div>
     </div>
@@ -116,7 +118,10 @@
               <!-- <div v-if="item.date === this.sDates">
                 {{ item }}
               </div> -->
-              <v-card-actions id="update" v-show="marks.length > 0">
+              <v-card-actions
+                id="update"
+                v-show="marks.length > 0 || checkSendData"
+              >
                 <button
                   v-bind:id="item._id + 'update'"
                   @click="updateThisMark(item)"
@@ -195,13 +200,13 @@ export default {
     check() {
       console.log(this.selectedClass);
     },
-
+    //загрузка значений прошлого дня
     async pow(x, data, test, data2) {
       if (x === 0) {
         return;
       }
       if (Object.keys(await test).length > 0) {
-        await this.load(data);
+        await this.load(data, 1);
         document.getElementById("sendData").disabled = false;
         return;
       } else {
@@ -224,20 +229,12 @@ export default {
       data = date.toISOString().slice(0, 10);
       var test = this.findMarksThis(date.toISOString().slice(0, 10));
       await this.pow(3, data, test, data2);
-      // let bottomHidden = document.querySelectorAll("#update");
+      //let bottomHidden = document.querySelectorAll("#update");
 
       // for (let i = 0; i < bottomHidden.length; i++) {
       //   bottomHidden[i].hidden = true;
       // }
-      // if (this.sDates.date === new Date().toISOString().slice(0, 10)) {
-      //   for (let i = 0; i < this.marks.length; i++) {
-      //     // document.getElementById(this.marks[i]._id).disabled = false;
-      //     console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
-      //     document.getElementById(this.marks[i].studentID).disabled = false;
-      //     console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
-      //   }
-      // }
-      this.checkSendData = 0;
+      console.log(this.marks.length, "FAWFAWFAWF");
     },
 
     countMarks(id, mark) {
@@ -280,7 +277,7 @@ export default {
       }
     },
 
-    async load(data) {
+    async load(data, checkLoadLast) {
       let bottomHidden = document.querySelectorAll("#update");
 
       for (i = 0; i < bottomHidden.length; i++) {
@@ -346,9 +343,10 @@ export default {
       let toDay = new Date().toISOString().slice(0, 10);
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
       if (this.marks.length > 0) {
-        // document.getElementById("loadLast").disabled = true;
+        if (document.getElementById("loadLast"))
+          document.getElementById("loadLast").disabled = true;
         // document.getElementById("sendData").disabled = true;
-        this.checkSendData = true;
+        // this.checkSendData = true;
         for (i = 0; i < this.marks.length; i++) {
           if (
             this.marks[i].change &&
@@ -357,22 +355,35 @@ export default {
             document.getElementById(
               this.marks[i].studentID + "update"
             ).disabled = false;
-
-            // let but = document.getElementById(
-            //   this.marks[i].studentID + "update"
-            // );
-            // but.remove();
           } else {
+            document.getElementById(
+              this.marks[i].studentID + "update"
+            ).disabled = true;
+            // document
+            //   .getElementById(this.marks[i].studentID + "update")
+            //   .remove();
+
             document.getElementById(this.marks[i].studentID).disabled = true;
-            document
-              .getElementById(this.marks[i].studentID + "update")
-              .remove();
           }
         }
       } else {
         this.checkSendData = false;
-        document.getElementById("loadLast").disabled = false;
+        if (document.getElementById("loadLast")) {
+          document.getElementById("loadLast").disabled = false;
+        }
+
         document.getElementById("sendData").disabled = false;
+      }
+
+      this.checkButtonHidden();
+      if (checkLoadLast) {
+        for (let i = 0; i < this.marks.length; i++) {
+          console.log("ЗАКОНЧИЛ123", i);
+          // document.getElementById(this.marks[i]._id).disabled = false;
+          console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
+          document.getElementById(this.marks[i].studentID).disabled = false;
+          console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
+        }
       }
     },
 
@@ -389,7 +400,6 @@ export default {
               a.name = "";
             } else {
               a.name = a.options[j].text;
-              // a.disabled = true;
             }
           }
 
@@ -489,16 +499,27 @@ export default {
       TutorialDataService.createMarks(datas)
         .then((response) => {
           console.log("УСПЕШНО ОТПРАВЛЕНО", response);
+          this.checkSendData = true;
         })
         .catch((e) => {
           console.log("1111111111", e);
         });
 
       document.getElementById("sendData").disabled = true;
+      this.checkSendData = true;
       let bottomHidden = document.querySelectorAll("#update");
+      console.log(bottomHidden, "bottomHidden");
       for (i = 0; i < bottomHidden.length; i++) {
         bottomHidden[i].hidden = false;
         bottomHidden[i].style = "display: flex";
+      }
+      for (i = 0; i < this.marks.length; i++) {
+        console.log(i, this.marks, this.marks[i]._id);
+        console.log(document.getElementById(this.marks[i]._id));
+
+        document.getElementById(
+          this.marks[i].studentID + "update"
+        ).disabled = false;
       }
       document.getElementById("loadLast").disabled = true;
 
@@ -577,6 +598,25 @@ export default {
         classID: data._id,
         className: data.className,
       };
+    },
+
+    checkButtonHidden() {
+      if (this.sDates.date === new Date().toISOString().slice(0, 10)) {
+        console.log(this.sDates.date, "OKKKKKKKKK");
+
+        for (let i = 0; i < this.marks.length; i++) {
+          let but = document.getElementById(this.marks[i].studentID + "update");
+          if (but.disabled) {
+            but.remove();
+          }
+        }
+      } else {
+        console.log("BADDD");
+        for (let i = 0; i < this.marks.length; i++) {
+          let but = document.getElementById(this.marks[i].studentID + "update");
+          but.remove();
+        }
+      }
     },
   },
   mounted() {

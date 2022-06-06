@@ -1,59 +1,65 @@
 <template>
   <v-app>
     <div>
-      <div v-if="check">
-        <navbar
-          class="navbar navbar-expand-lg navbar-light"
-          style="background-color: #e3f2fd border: 1px solid grey;padding: -10px -20px 0px 0px;"
-        >
-          <div style="text-align: center; font-weight: bold; font-size: 16px">
-            ACT
-            <div style="font-size: 12px">assistant class teacher</div>
-          </div>
-          <v-btn to="/dashboard" text> ГЛАВНАЯ </v-btn>
-          <!-- <v-btn to="/class" text> Классы </v-btn> -->
-          <!-- <v-btn to="/CreateStudent" text> Ученики </v-btn> -->
-          <!-- <v-btn to="/Categories" text> Категории </v-btn> -->
-          <v-btn to="/Statistic" text> Статистика </v-btn>
-          <v-btn to="/Receipt" text> Квитанции </v-btn>
+      <transition name="component-fade" mode="out-in">
+        <div v-if="check">
+          <navbar
+            class="navbar navbar-expand-lg navbar-light"
+            style="background-color: #e3f2fd border: 1px solid grey;padding: -10px -20px 0px 0px;"
+          >
+            <div style="text-align: center; font-weight: bold; font-size: 16px">
+              ACT
+              <div style="font-size: 12px">assistant class teacher</div>
+            </div>
+            <v-btn to="/dashboard" text> ГЛАВНАЯ </v-btn>
+            <!-- <v-btn to="/class" text> Классы </v-btn> -->
+            <!-- <v-btn to="/CreateStudent" text> Ученики </v-btn> -->
+            <!-- <v-btn to="/Categories" text> Категории </v-btn> -->
+            <v-btn to="/Statistic" text> Статистика </v-btn>
+            <v-btn to="/Receipt" text> Квитанции </v-btn>
 
-          <!-- <v-btn to="/CreateDate" text> Даты </v-btn> -->
-          <!-- v-if="selectedClass.classID === 'admin'" -->
-          <div class="dropdown">
-            <button
-              class="btn btn-info dropdown-toggle"
-              type="button"
-              id="dropdownMenuButton1"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              НАСТРОЙКА
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li v-if="selectedClass.classID === 'admin'">
-                <v-btn to="/class" text> Классы </v-btn>
-              </li>
-              <!-- <li><a class="dropdown-item" href="/">Другое действие</a></li> -->
-              <li><v-btn to="/CreateStudent" text> Ученики </v-btn></li>
-              <li v-if="selectedClass.classID === 'admin'">
-                <v-btn to="/Categories" text> Категории и причины </v-btn>
-              </li>
-            </ul>
-          </div>
+            <!-- <v-btn to="/CreateDate" text> Даты </v-btn> -->
+            <!-- v-if="selectedClass.classID === 'admin'" -->
+            <div class="dropdown">
+              <button
+                class="btn btn-info dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton1"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                НАСТРОЙКА
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li v-if="selectedClass.classID === 'admin'">
+                  <v-btn to="/class" text> Классы </v-btn>
+                </li>
+                <!-- <li><a class="dropdown-item" href="/">Другое действие</a></li> -->
+                <li><v-btn to="/CreateStudent" text> Ученики </v-btn></li>
+                <li v-if="selectedClass.classID === 'admin'">
+                  <v-btn to="/Categories" text> Категории и причины </v-btn>
+                </li>
+              </ul>
+            </div>
 
-          <v-btn class="btn btn-danger" @click="del" to="/" text> ВЫХОД </v-btn>
+            <v-btn class="btn btn-danger" @click="del" to="/" text>
+              ВЫХОД
+            </v-btn>
 
-          <div style="padding-left: 20px">
-            Вход выполнен для класса: {{ selectedClass.className }}
-          </div>
-          <!-- <v-btn to="/tutorials" text> Tutorials </v-btn>
+            <div style="padding-left: 20px">
+              Вход выполнен для класса: {{ selectedClass.className }}
+            </div>
+            <!-- <v-btn to="/tutorials" text> Tutorials </v-btn>
       <v-btn to="/add" text> Add </v-btn> -->
-        </navbar>
-      </div>
+          </navbar>
+        </div>
+      </transition>
     </div>
     <v-main>
       <!-- <button @click="checked()">CHECK</button> -->
-      <router-view @example="methodName" :selectedClass="selectedClass" />
+      <transition name="component-fade" mode="out-in" appear>
+        <router-view @example="methodName" :selectedClass="selectedClass" />
+      </transition>
     </v-main>
   </v-app>
 </template>
@@ -106,4 +112,17 @@ export default {
   },
 };
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+.component-fade-enter-active,
+.component-fade-leave-active {
+  //transition: opacity 0.3s ease;
+
+  transition: all 0.36s ease-out;
+  animation-delay: 250ms;
+}
+.component-fade-enter, .component-fade-leave-to
+/* .component-fade-leave-active до версии 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
+}
+</style>
