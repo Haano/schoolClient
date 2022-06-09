@@ -137,7 +137,16 @@
                 >
               </li>
 
-              <li>Данные отправлены на: {{ marks.length }}</li>
+              <li
+                v-if="marks.length === studentsList.length"
+                style="color: green"
+                class="LI-class"
+              >
+                Данные отправлены на: {{ marks.length }}
+              </li>
+              <li v-if="marks.length != studentsList.length" style="color: red">
+                Данные отправлены на: {{ marks.length }}
+              </li>
               <li>
                 Отсутствует: {{ marksPrint.length }} ({{
                   reversedMessage(marksPrint.length)
@@ -695,7 +704,7 @@ export default {
       let printHtml2 = document.getElementById("ul-stat").innerHTML;
 
       let style =
-        "<style type='text/css'>table {border: 1px solid black; border-collapse: collapse;}  th,td { padding: 2px;border: 1px solid black; } </style> ";
+        "<style type='text/css'>.LI-class {color: black;} ul,li {color: black;}table {border: 1px solid black; border-collapse: collapse; font-size:10px}  th,td { padding: 2px;border: 1px solid black; } </style> ";
 
       let ulstat3 = document.getElementById("ul-stat3").innerHTML;
 
@@ -703,6 +712,9 @@ export default {
       printHtml2 += printHtml;
       top += printHtml2;
       top += style;
+
+      top +=
+        "<footer><h3>Директор МБОУ СОШ №24 &nbsp &nbsp&nbsp&nbsp&nbsp_________ &nbsp&nbsp&nbsp&nbsp&nbsp&nbspН.А. Голеницкая</h3></footer>";
 
       console.log(top);
       let tab = window.open(

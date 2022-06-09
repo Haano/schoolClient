@@ -4,7 +4,10 @@
 
     <div class="flex">
       <div class="dashboard-main">
-        <v-progress-linear v-model="progress"></v-progress-linear>
+        <v-progress-linear
+          v-if="progress < 100"
+          v-model="progress"
+        ></v-progress-linear>
         Класс
         <select
           class="form-select"
@@ -32,7 +35,7 @@
         <div
           v-if="
             selectedClassID &&
-            sDates.date === new Date().toISOString().slice(0, 10)
+            sDates.date === new Date(DateInternet).toISOString().slice(0, 10)
           "
         >
           <button
@@ -45,7 +48,10 @@
           </button>
         </div>
         <transition class="reciept-table" name="list">
-          <div v-if="checkShowTable">
+          <div
+            v-if="checkShowTable"
+            style="margin-top: 10px; margin-left: auto; margin-right: auto"
+          >
             <table class="reciept-table">
               <thead>
                 <tr>
@@ -239,6 +245,7 @@ export default {
   },
   data() {
     return {
+      DateInternet: new Date(),
       progress: 0,
       checkShowTable: false,
       checkSendData: false,
@@ -280,6 +287,45 @@ export default {
   },
 
   methods: {
+    clearFullData() {
+      this.progress = 0;
+      this.checkShowTable = false;
+      this.checkSendData = false;
+      this.countMark = [];
+      this.sClass = [{ className: "123", classID: "sadasd" }];
+      this.sClassInput = [];
+      this.categoryCount = [];
+      this.selectedClassID = [];
+      this.selectedMarks = [];
+      // this.sDates = [];
+      this.marks = [];
+      this.causesDefault = [
+        { id: "1", causes: "Всего", count: 0 },
+        { id: "2", causes: "В школе", count: 0 },
+      ];
+      this.causes = [{ id: "1", causes: "-", count: 0 }];
+      this.title = "";
+      this.headers = [
+        {
+          value: "index",
+          text: "#",
+          width: "30px",
+        },
+        {
+          text: "Фамилия",
+          value: "FirstName",
+          sortable: false,
+          width: "90px",
+        },
+        { text: "Имя", value: "LastName", sortable: false, width: "10px" },
+        {
+          text: "Категория",
+          value: "Category",
+          sortable: false,
+          width: "30px",
+        },
+      ];
+    },
     check() {
       console.log(this.selectedClass);
     },
@@ -442,7 +488,7 @@ export default {
       await this.selectedSelect();
       this.$set(this.causesDefault[0], "count", this.sClassInput.length);
 
-      let toDay = new Date().toISOString().slice(0, 10);
+      let toDay = new Date(this.DateInternet).toISOString().slice(0, 10);
       // this.$set(this.causesDefault[1], "count", this.sClassInput.length);
       if (this.marks.length > 0) {
         if (document.getElementById("loadLast"))
@@ -584,7 +630,8 @@ export default {
       document.getElementById(data._id + "update").remove();
     },
 
-    send() {
+    async send() {
+      this.progress = 10;
       let temp;
       var data = this.sClassInput;
       var datas = new Array();
@@ -610,36 +657,60 @@ export default {
           };
         }
       }
-      TutorialDataService.createMarks(datas)
-        .then((response) => {
+      this.progress = 30;
+      await TutorialDataService.createMarks(datas)
+        .then(async (response) => {
           console.log("УСПЕШНО ОТПРАВЛЕНО", response);
           this.checkSendData = true;
+          this.progress = 50;
+          if (this.selectedClass.classID != "admin" && response) {
+            await this.clearFullData();
+            this.progress = 60;
+            this.$set(this.headers, 4, {
+              text: this.sDates.date,
+              value: "date",
+              width: "40%",
+              sortable: false,
+            });
+            await TutorialDataService.getAllCLass()
+              .then((response) => {
+                this.sClass = response.data.map(this.getDisplayClass);
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+            console.log(this.selectedClass);
+            this.selectedClassID = this.selectedClass;
+            this.progress = 80;
+            await this.show(this.selectedClassID);
+          }
         })
         .catch((e) => {
           console.log("1111111111", e);
         });
+      //await this.retrieveClass();
 
-      document.getElementById("sendData").disabled = true;
-      this.checkSendData = true;
-      let bottomHidden = document.querySelectorAll("#update");
-      console.log(bottomHidden, "bottomHidden");
-      for (i = 0; i < bottomHidden.length; i++) {
-        bottomHidden[i].hidden = false;
-        bottomHidden[i].style = "display: flex";
-      }
-      for (i = 0; i < this.marks.length; i++) {
-        console.log(i, this.marks, this.marks[i]._id);
-        console.log(
-          document.getElementById(this.marks[i].studentID + "update")
-        );
-        if (document.getElementById(this.marks[i].studentID + "update"))
-          document.getElementById(
-            this.marks[i].studentID + "update"
-          ).disabled = false;
-      }
-      document.getElementById("loadLast").disabled = true;
+      // document.getElementById("sendData").disabled = true;
+      // this.checkSendData = true;
+      // let bottomHidden = document.querySelectorAll("#update");
+      // console.log(bottomHidden, "bottomHidden");
+      // for (i = 0; i < bottomHidden.length; i++) {
+      //   bottomHidden[i].hidden = false;
+      //   bottomHidden[i].style = "display: flex";
+      // }
+      // for (i = 0; i < this.marks.length; i++) {
+      //   console.log(i, this.marks, this.marks[i]._id);
+      //   console.log(
+      //     document.getElementById(this.marks[i].studentID + "update")
+      //   );
+      //   if (document.getElementById(this.marks[i].studentID + "update"))
+      //     document.getElementById(
+      //       this.marks[i].studentID + "update"
+      //     ).disabled = false;
+      // }
+      // document.getElementById("loadLast").disabled = true;
 
-      this.show(this.selectedClassID);
+      // this.show(data);
     },
 
     show(data) {
@@ -667,10 +738,39 @@ export default {
       }
     },
 
+    getDate() {
+      let plus = 3; // Сколько времени прибавляем (+3 это время по Москве)
+      var xhr = new XMLHttpRequest();
+      xhr.open(
+        "GET",
+        "http://worldtimeapi.org/api/timezone/Europe/London",
+        false
+      ); // Делаем запрос по Лондону
+      xhr.send(); // отправляем
+      if (xhr.status != 200) {
+        console.log(xhr.status + ": " + xhr.statusText); // Если статус не равен 200, то выводим ошибку.
+      } else {
+        let time = xhr.responseText; // получаем текст ответа
+        let z = JSON.parse(time).utc_datetime; // Получаем время utc
+        let time1 = new Date(z).getTime(); // Переводим в timestamp
+        let timestampPlus = time1 + plus * 60 * 60 * 1000; // Воемя +3 часа. Если надо получить время UTC, то убираем просто параметр plus
+        let timePlus = new Date(timestampPlus); // Переводим во время (Тут надо понимать, что система сама переведёт его в текущую временную зону
+        let result = timePlus.toUTCString(); // Переводим в строку UTC;
+        console.log(result, "!!!!!!!!!!!!!!!"); // Выводим дату.
+        return result;
+      }
+    },
+
     async retrieveClass() {
       //поставить текущую дату
-      document.getElementById("Date").value = new Date();
-      this.$set(this.sDates, "date", new Date().toISOString().slice(0, 10));
+      document.getElementById("Date").value = this.DateInternet;
+
+      console.log(new Date(this.DateInternet));
+      this.$set(
+        this.sDates,
+        "date",
+        new Date(this.DateInternet).toISOString().slice(0, 10)
+      );
       // добавить колонку с датой и выбором
       this.$set(this.headers, 4, {
         text: this.sDates.date,
@@ -718,7 +818,10 @@ export default {
     },
 
     checkButtonHidden() {
-      if (this.sDates.date === new Date().toISOString().slice(0, 10)) {
+      if (
+        this.sDates.date ===
+        new Date(this.DateInternet).toISOString().slice(0, 10)
+      ) {
         console.log(this.sDates.date, "OKKKKKKKKK");
 
         for (let i = 0; i < this.marks.length; i++) {
@@ -732,7 +835,9 @@ export default {
         console.log("BADDD");
         for (let i = 0; i < this.marks.length; i++) {
           let but = document.getElementById(this.marks[i].studentID + "update");
-          but.remove();
+          if (but != null) {
+            but.remove();
+          }
         }
       }
     },
@@ -793,11 +898,14 @@ export default {
     },
   },
   mounted() {
+    this.DateInternet = this.getDate();
+    console.log(this.DateInternet);
     this.retrieveClass();
   },
 
   computed: {
     // геттер вычисляемого значения
+
     countedCausesDef: function () {
       // `this` указывает на экземпляр vm
       return this.causesDefault[0].count - this.causesDefault[1].count;
