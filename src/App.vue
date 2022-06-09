@@ -113,6 +113,21 @@ export default {
 };
 </script>
 <style lang="scss">
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.v-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .component-fade-enter-active,
 .component-fade-leave-active {
   //transition: opacity 0.3s ease;
