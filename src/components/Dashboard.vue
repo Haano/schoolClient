@@ -1,8 +1,10 @@
 <template>
   <div>
     <!-- <button @click="check()">ПРОВЕРКА</button> -->
+
     <div class="flex">
       <div class="dashboard-main">
+        <v-progress-linear v-model="progress"></v-progress-linear>
         Класс
         <select
           class="form-select"
@@ -42,103 +44,168 @@
             Загрузить значения прошлого дня
           </button>
         </div>
+        <transition class="reciept-table" name="list">
+          <div v-if="checkShowTable">
+            <table class="reciept-table">
+              <thead>
+                <tr>
+                  <th v-for="cat in categoryCount" :key="cat.name">
+                    {{ cat.name }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td v-for="cat in categoryCount" :key="cat.name">
+                    {{ cat.count }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </transition>
       </div>
-      <div class="dashboard-main">
-        <div class="flex-ul">
-          <ul>
-            <li v-for="caus in causesDefault" :key="caus.causes">
-              {{ caus.causes }}
-              = {{ caus.count }}
-            </li>
-          </ul>
-
-          <ul>
-            <li v-for="caus in causes" :key="caus.causes">
-              {{ caus.causes }}
-              =
-              {{ caus.count }}
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <transition name="fade" mode="out-in">
-            <div v-if="!checkSendData">
-              <button
-                id="sendData"
-                class="btn btn-primary"
-                @click="send()"
-                color="primary"
-              >
-                ОТПРАВИТЬ ДАННЫЕ
-              </button>
-            </div>
-
-            <div v-else>
-              <button
-                id="sendData"
-                class="btn btn-danger"
-                color="primary"
-                disabled="true"
-              >
-                Данные были отправлены
-              </button>
-            </div>
-          </transition>
-        </div>
-      </div>
-    </div>
-    <div class="myTable">
-      <v-col>
-        <v-data-table
-          :headers="headers"
-          :items="this.sClassInput"
-          :items-per-page="50"
-          hide-default-footer
-        >
-          <template v-slot:[`item.index`]="{ index }">
-            {{ index + 1 }}
-          </template>
-
-          <template v-slot:[`item.date`]="{ item }">
-            <div class="select-flex">
-              <div class="select">
-                <select
-                  class="form-select"
-                  name="marks"
-                  v-bind:id="item._id"
-                  @change="countMarks(item._id, item)"
-                  v-bind:title="item.date"
-                >
-                  <!-- v-model="item.mark" -->
-                  <option value=""></option>
-                  <option v-for="caus in causes" :key="caus.causes">
+      <transition class="reciept-table" name="list">
+        <div v-if="checkShowTable" class="dashboard-main">
+          <div class="flex-ul">
+            <table
+              class="reciept-table"
+              style="
+                margin-bottom: 10px;
+                margin-left: auto;
+                margin-right: auto;
+                width: 274px;
+              "
+            >
+              <thead>
+                <tr>
+                  <th
+                    v-for="caus in causesDefault"
+                    :key="caus.causes"
+                    style="max-width: 180px"
+                  >
                     {{ caus.causes }}
-                  </option>
-                </select>
+                  </th>
+                  <th>Отсутствует</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    v-for="caus in causesDefault"
+                    :key="caus.causes"
+                    style="max-width: 180px"
+                  >
+                    {{ caus.count }}
+                  </td>
+                  <td>{{ countedCausesDef }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div v-if="checkShowTable">
+              <table class="reciept-table" style="margin-bottom: 10px">
+                <thead>
+                  <tr>
+                    <th style="max-width: 180px">Причина</th>
+                    <th>Количество</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr v-for="caus in causes" :key="caus.causes">
+                    <td style="max-width: 180px">{{ caus.causes }}</td>
+                    <td>{{ caus.count }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="align-items: center">
+            <transition name="fade" mode="out-in">
+              <div v-if="!checkSendData">
+                <button
+                  id="sendData"
+                  class="btn btn-primary"
+                  @click="send()"
+                  color="primary"
+                  style="margin-left: auto; margin-right: auto"
+                >
+                  ОТПРАВИТЬ ДАННЫЕ
+                </button>
               </div>
 
-              <!-- <span>{{ item.date }}{{ item }}</span> -->
-              <!-- <div v-if="item.date === this.sDates">
+              <div v-else>
+                <button
+                  id="sendData"
+                  class="btn btn-danger"
+                  color="primary"
+                  disabled="true"
+                  style="margin-left: auto; margin-right: auto"
+                >
+                  Данные были отправлены
+                </button>
+              </div>
+            </transition>
+          </div>
+        </div>
+      </transition>
+    </div>
+
+    <transition class="reciept-table" name="list">
+      <div v-if="checkShowTable" class="myTable">
+        <v-col>
+          <v-data-table
+            :headers="headers"
+            :items="this.sClassInput"
+            :items-per-page="50"
+            hide-default-footer
+          >
+            <template v-slot:[`item.index`]="{ index }">
+              {{ index + 1 }}
+            </template>
+
+            <template v-slot:[`item.date`]="{ item }">
+              <div class="select-flex">
+                <div class="select">
+                  <select
+                    class="form-select"
+                    name="marks"
+                    v-bind:id="item._id"
+                    @change="countMarks(item._id, item)"
+                    v-bind:title="item.date"
+                  >
+                    <!-- v-model="item.mark" -->
+                    <option value=""></option>
+                    <option v-for="caus in causes" :key="caus.causes">
+                      {{ caus.causes }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- <span>{{ item.date }}{{ item }}</span> -->
+                <!-- <div v-if="item.date === this.sDates">
                 {{ item }}
               </div> -->
-              <v-card-actions
-                id="update"
-                v-show="marks.length > 0 || checkSendData"
-              >
-                <button
-                  v-bind:id="item._id + 'update'"
-                  @click="updateThisMark(item)"
-                  class="btn btn-success"
+                <v-card-actions
+                  id="update"
+                  v-show="marks.length > 0 || checkSendData"
                 >
-                  Обновить
-                </button>
-              </v-card-actions>
-            </div>
-          </template>
-        </v-data-table>
-      </v-col>
-    </div>
+                  <button
+                    v-bind:id="item._id + 'update'"
+                    @click="updateThisMark(item)"
+                    class="btn btn-success"
+                  >
+                    Обновить
+                  </button>
+                </v-card-actions>
+              </div>
+            </template>
+          </v-data-table>
+        </v-col>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -175,17 +242,20 @@ export default {
   },
   data() {
     return {
+      progress: 0,
+      checkShowTable: false,
       checkSendData: false,
       countMark: [],
       sClass: [{ className: "123", classID: "sadasd" }],
       sClassInput: [],
+      categoryCount: [],
       selectedClassID: [],
       selectedMarks: [],
       sDates: [],
       marks: [],
       causesDefault: [
-        { id: "1", causes: "Всего учеников:", count: 0 },
-        { id: "2", causes: "Присутствует:", count: 0 },
+        { id: "1", causes: "Всего", count: 0 },
+        { id: "2", causes: "В школе", count: 0 },
       ],
       causes: [{ id: "1", causes: "-", count: 0 }],
       title: "",
@@ -216,6 +286,7 @@ export default {
     check() {
       console.log(this.selectedClass);
     },
+
     //загрузка значений прошлого дня
     async pow(x, data, test, data2) {
       if (x === 0) {
@@ -276,6 +347,9 @@ export default {
       // let presentCount = Document.getElementsByClassName(".form-select");
       // console.log("!!!!!!!!! presentCount", presentCount);
 
+      for (let c = 0; c < this.categoryCount.length; c++) {
+        this.categoryCount[c].count = 0;
+      }
       for (var i = 0; i < this.sClassInput.length; i++) {
         if (
           this.sClassInput[i].mark === "Питался" ||
@@ -284,16 +358,25 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         }
-        // if (this.sClassInput[i].count) {
-        //
-        // }
+
+        if (
+          this.sClassInput[i].Category !== "" &&
+          this.sClassInput[i].mark === "Питался"
+        ) {
+          for (let c = 0; c < this.categoryCount.length; c++) {
+            if (this.sClassInput[i].Category === this.categoryCount[c].name) {
+              this.categoryCount[c].count += 1;
+            }
+          }
+        }
       }
     },
 
     async load(data, checkLoadLast) {
+      this.progress = 10;
       let bottomHidden = document.querySelectorAll("#update");
 
       for (i = 0; i < bottomHidden.length; i++) {
@@ -312,18 +395,23 @@ export default {
 
       await TutorialDataService.getAllCauses().then((response) => {
         this.causes = response.data.map(this.getDisplayCauses);
+        this.progress = 50;
       });
 
       this.$set(this.causesDefault[1], "count", 0);
+      await this.showTable();
 
       for (i = 0; i < this.sClassInput.length; i++) {
-        // let but = document.getElementById(this.sClassInput[i]._id + "update");
+        let tempObjCat = new Object();
+        tempObjCat.name = this.sClassInput[i].Category;
+        tempObjCat.count = 0;
+        this.categoryCount[i] = tempObjCat;
+
+        console.log(this.categoryCount, "categoryCOUNT");
+
         document.getElementById(
-          this.sClassInput[i]._id + "update",
+          this.sClassInput[i]._id + "update"
         ).disabled = false;
-        // document
-        //   .getElementById(this.sClassInput[i]._id + "update")
-        //   .parentNode.removeChild(but);
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
             this.$set(this.sClassInput[i], "date", this.marks[j].causesID);
@@ -347,12 +435,13 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         } else {
           this.sClassInput[i].count = false;
         }
       }
+
       await this.selectedSelect();
       this.$set(this.causesDefault[0], "count", this.sClassInput.length);
 
@@ -369,11 +458,11 @@ export default {
             toDay === this.marks[i].date.slice(0, 10)
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update",
+              this.marks[i].studentID + "update"
             ).disabled = false;
           } else {
             document.getElementById(
-              this.marks[i].studentID + "update",
+              this.marks[i].studentID + "update"
             ).disabled = true;
             // document
             //   .getElementById(this.marks[i].studentID + "update")
@@ -401,14 +490,36 @@ export default {
           console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
         }
       }
+
+      let newArray = this.categoryCount.filter(function (f) {
+        return f.name !== "";
+      });
+      newArray = newArray.filter(function (f) {
+        return f.name !== undefined;
+      });
+
+      this.categoryCount = this.removeDuplicates(newArray);
+
+      await this.fullDownload();
     },
 
     selectedSelect() {
-      var a;
+      let a;
 
-      for (var i = 0; i < this.sClassInput.length; i++) {
-        for (var j = 0; j <= this.causes.length; j++) {
-          a = document.getElementById(this.sClassInput[i]._id);
+      for (let i = 0; i < this.sClassInput.length; i++) {
+        a = document.getElementById(this.sClassInput[i]._id);
+
+        if (
+          this.sClassInput[i].date === "Питался" &&
+          this.sClassInput[i].Category !== ""
+        ) {
+          for (let c = 0; c < this.categoryCount.length; c++) {
+            if (this.sClassInput[i].Category === this.categoryCount[c].name) {
+              this.categoryCount[c].count += 1;
+            }
+          }
+        }
+        for (let j = 0; j <= this.causes.length; j++) {
           if (a.options[j].text === this.sClassInput[i].date) {
             a.options[j].selected = true;
 
@@ -418,21 +529,10 @@ export default {
               a.name = a.options[j].text;
             }
           }
-
-          // else {
-          //   if (a.options[j].text === "Питался") {
-          //     a.options[j].selected = true;
-          //     a.name = a.options[j].text;
-          //     this.$set(
-          //       this.causes[j - 1],
-          //       "count",
-          //       (this.causes[j - 1].count += 1)
-          //     );
-          //     console.log("asdasd");
-          //   }
-          // }
         }
       }
+
+      this.progress = 80;
     },
 
     async findMarksThis(data) {
@@ -457,6 +557,7 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+
       return temp1;
     },
 
@@ -534,7 +635,7 @@ export default {
         console.log(document.getElementById(this.marks[i]._id));
 
         document.getElementById(
-          this.marks[i].studentID + "update",
+          this.marks[i].studentID + "update"
         ).disabled = false;
       }
       document.getElementById("loadLast").disabled = true;
@@ -555,6 +656,7 @@ export default {
           for (var i = 0; i < a.length; i++) {
             this.$set(this.sClassInput, i, a[i]);
           }
+
           // this.$set(this.sClassInput, 3, a);
         })
         .catch((e) => {
@@ -589,7 +691,7 @@ export default {
 
       if (this.selectedClass.classID != "admin") {
         this.selectedClassID = this.selectedClass;
-        this.show();
+        await this.show();
         document.getElementById("class").disabled = true;
       }
     },
@@ -634,11 +736,82 @@ export default {
         }
       }
     },
+
+    removeDuplicates(arr) {
+      const result = [];
+      const duplicatesIndices = [];
+
+      // Перебираем каждый элемент в исходном массиве
+      arr.forEach((current, index) => {
+        if (duplicatesIndices.includes(index)) return;
+
+        result.push(current);
+
+        // Сравниваем каждый элемент в массиве после текущего
+        for (
+          let comparisonIndex = index + 1;
+          comparisonIndex < arr.length;
+          comparisonIndex++
+        ) {
+          const comparison = arr[comparisonIndex];
+          const currentKeys = Object.keys(current);
+          const comparisonKeys = Object.keys(comparison);
+
+          // Проверяем длину массивов
+          if (currentKeys.length !== comparisonKeys.length) continue;
+
+          // Проверяем значение ключей
+          const currentKeysString = currentKeys.sort().join("").toLowerCase();
+          const comparisonKeysString = comparisonKeys
+            .sort()
+            .join("")
+            .toLowerCase();
+          if (currentKeysString !== comparisonKeysString) continue;
+
+          // Проверяем индексы ключей
+          let valuesEqual = true;
+          for (let i = 0; i < currentKeys.length; i++) {
+            const key = currentKeys[i];
+            if (current[key] !== comparison[key]) {
+              valuesEqual = false;
+              break;
+            }
+          }
+          if (valuesEqual) duplicatesIndices.push(comparisonIndex);
+        } // Конец цикла
+      });
+      return result;
+    },
+
+    showTable() {
+      this.checkShowTable = true;
+    },
+
+    fullDownload() {
+      this.progress = 100;
+    },
   },
   mounted() {
     this.retrieveClass();
   },
+
+  computed: {
+    // геттер вычисляемого значения
+    countedCausesDef: function () {
+      // `this` указывает на экземпляр vm
+      return this.causesDefault[0].count - this.causesDefault[1].count;
+    },
+  },
 };
 </script>
 
-<style></style>
+<style>
+.v-data-table > .v-data-table > table > tbody > tr > td,
+.v-data-table > .v-data-table > table > thead > tr > td,
+.v-data-table > .v-data-table > table > tfoot > tr > td {
+  height: 10px;
+}
+.form-select {
+  height: 40px;
+}
+</style>
