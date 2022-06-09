@@ -264,7 +264,7 @@
             </tr>
 
             <template v-if="!chek">
-              <tr>
+              <tr v-if="selectedStudentID._id">
                 <td style="width: 180px">
                   <b
                     >{{ selectedStudentID.FirstName }}
@@ -302,7 +302,7 @@
                     selectedStudentID.amountReciept
                   }}
                 </td>
-                <td v-if="!selectedStudentID.amount && !check">0</td>
+                <!-- <td v-if="!selectedStudentID.amount && !check">0</td> -->
               </tr>
             </template>
 
@@ -333,6 +333,14 @@
             </template>
           </tbody>
         </table>
+        <!-- <div></div> -->
+        <!-- <button
+          class="btn btn-danger"
+          style="padding: -20px -20px -20px -20px"
+          @click="check()"
+        >
+          check
+        </button> -->
       </div>
     </div>
 
@@ -375,7 +383,7 @@ export default {
   },
   data() {
     return {
-      showCategory: true,
+      showCategory: false,
       loading: false,
       period: "",
       identifier: "",
@@ -402,7 +410,7 @@ export default {
       receipts: [],
       receiptsAll: [],
       selectedClassID: [{ lastName: "" }],
-      selectedStudentID: [""],
+      selectedStudentID: [],
       amount: 0,
       amountGetReciept: 0,
       sClass: [],
@@ -410,6 +418,9 @@ export default {
     };
   },
   methods: {
+    // check() {
+    //   console.log(this.selectedStudentID);
+    // },
     clearFullData() {
       this.marks = [];
       this.amount = 0;
@@ -444,7 +455,7 @@ export default {
       this.loading = false;
     },
 
-    getRecieptsByRangeDatePOST() {
+    async getRecieptsByRangeDatePOST() {
       console.log(this.dateFrom);
       // alert("нажата", this.dateFrom, this.dateBefore);
       this.amountGetReciept = 0;
@@ -455,22 +466,24 @@ export default {
         dateBefore: this.dateBefore,
       };
 
-      TutorialDataService.findRecieptByDateRange(data).then((response) => {
-        this.receipts.splice(response.data);
-        var a = new Array();
-        a = Object.values(response.data);
-        for (let i = 0; i < a.length; i++) {
-          a[i].datePrint = new Date(a[i].date);
+      await TutorialDataService.findRecieptByDateRange(data).then(
+        (response) => {
+          this.receipts.splice(response.data);
+          var a = new Array();
+          a = Object.values(response.data);
+          for (let i = 0; i < a.length; i++) {
+            a[i].datePrint = new Date(a[i].date);
 
-          a[i].datePrint = a[i].datePrint.toLocaleDateString();
+            a[i].datePrint = a[i].datePrint.toLocaleDateString();
 
-          this.$set(this.receipts, i, a[i]);
-          // this.$set(this.Students[i], amount, 0);
-        }
-        for (let j = 0; j < this.receipts.length; j++) {
-          this.amountGetReciept += this.receipts[j].amount;
-        }
-      });
+            this.$set(this.receipts, i, a[i]);
+            // this.$set(this.Students[i], amount, 0);
+          }
+          for (let j = 0; j < this.receipts.length; j++) {
+            this.amountGetReciept += this.receipts[j].amount;
+          }
+        },
+      );
       this.receiptsAll = this.receipts;
     },
 

@@ -145,8 +145,8 @@
               </li>
             </ul>
 
-            <ul id="ul-stat">
-              <transition-group name="list">
+            <ul id="ul-stat3">
+              <transition-group name="list" id="ul-stat2">
                 <li v-for="caus in countAll" :key="caus.causes">
                   {{ caus.causes }} = {{ caus.count }} ({{
                     reversedMessage(caus.count)
@@ -692,7 +692,7 @@ export default {
         script +
         "<" +
         scriptEnd +
-        "</head><body onload='alert(1)'><h2> МБОУ СОШ №24</h2> <h3>Отсутствующие на " +
+        "</head><body onload='window.print()'><h2> МБОУ СОШ №24</h2> <h3>Отсутствующие на " +
         data +
         "</h3>";
       let printHtml = document.getElementById("table").innerHTML; // Получаем содержимое узла для печати
@@ -703,15 +703,31 @@ export default {
 
       let sc =
         "<script  type='text/javascript'>window.addEventListener('DOMContentLoaded', (event) => {console.log('DOM fully loaded and parsed');});";
+      let ulstat3 = document.getElementById("ul-stat3").innerHTML;
+
+      printHtml2 += ulstat3;
       printHtml2 += printHtml;
       top += printHtml2;
       top += style;
       top += sc;
       console.log(top);
-      let tab = window.open("");
+      let tab = window.open(
+        "",
+        "",
+        "left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0",
+      );
       tab.document.write(top);
-      tab.document.print();
+      tab.document.close();
+      tab.focus();
       localStorage.setItem("user", auth);
+
+      tab.print();
+
+      tab.onfocus = function () {
+        setTimeout(function () {
+          tab.close();
+        }, 500);
+      };
     },
 
     async changeGlobalOption(globalOption) {
