@@ -13,8 +13,8 @@
           id="class"
         >
           <option
-            v-for="user in sClass"
-            :key="user.className"
+            v-for="(user, index) in sClass"
+            :key="index"
             v-bind:value="user"
           >
             {{ user.className }}
@@ -49,14 +49,14 @@
             <table class="reciept-table">
               <thead>
                 <tr>
-                  <th v-for="cat in categoryCount" :key="cat.name">
+                  <th v-for="(cat, index) in categoryCount" :key="index">
                     {{ cat.name }}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td v-for="cat in categoryCount" :key="cat.name">
+                  <td v-for="(cat, index) in categoryCount" :key="index">
                     {{ cat.count }}
                   </td>
                 </tr>
@@ -80,8 +80,8 @@
               <thead>
                 <tr>
                   <th
-                    v-for="caus in causesDefault"
-                    :key="caus.causes"
+                    v-for="(caus, index) in causesDefault"
+                    :key="index"
                     style="max-width: 180px"
                   >
                     {{ caus.causes }}
@@ -92,8 +92,8 @@
               <tbody>
                 <tr>
                   <td
-                    v-for="caus in causesDefault"
-                    :key="caus.causes"
+                    v-for="(caus, index) in causesDefault"
+                    :key="index"
                     style="max-width: 180px"
                   >
                     {{ caus.count }}
@@ -113,7 +113,7 @@
                 </thead>
 
                 <tbody>
-                  <tr v-for="caus in causes" :key="caus.causes">
+                  <tr v-for="(caus, index) in causes" :key="index">
                     <td style="max-width: 180px">{{ caus.causes }}</td>
                     <td>{{ caus.count }}</td>
                   </tr>
@@ -477,13 +477,13 @@ export default {
         document.getElementById("sendData").disabled = false;
       }
 
-      this.checkButtonHidden();
       if (checkLoadLast) {
         for (let i = 0; i < this.marks.length; i++) {
           console.log("ЗАКОНЧИЛ123", i);
           // document.getElementById(this.marks[i]._id).disabled = false;
           console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
           document.getElementById(this.marks[i].studentID).disabled = false;
+
           console.log("ИЩЕТ ЭТОТ ID", this.marks[i].studentID);
         }
       }
@@ -494,9 +494,9 @@ export default {
       newArray = newArray.filter(function (f) {
         return f.name !== undefined;
       });
-
       this.categoryCount = this.removeDuplicates(newArray);
 
+      this.checkButtonHidden();
       await this.fullDownload();
     },
 
@@ -723,7 +723,8 @@ export default {
 
         for (let i = 0; i < this.marks.length; i++) {
           let but = document.getElementById(this.marks[i].studentID + "update");
-          if (but.disabled) {
+          //let inputBut = document.getElementById(this.marks[i].studentID);
+          if (but != null && but.disabled) {
             but.remove();
           }
         }
@@ -787,6 +788,7 @@ export default {
     },
 
     fullDownload() {
+      console.log("123");
       this.progress = 100;
     },
   },

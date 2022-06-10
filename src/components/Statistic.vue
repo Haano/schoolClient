@@ -352,13 +352,14 @@ export default {
     },
     async initializationByClass() {
       this.clearFullDataClass();
-      //await this.getAllClass();
+
       await this.changeClass();
       await this.getMarksByDateRange(); // получить все марки (marks and marksPrint)
       await this.findAllStudents(); // получить всех учеников (students)
       await this.defineTileColorClass(); //покрасить плитки в нужный цвет
       await this.countStat();
       this.changeGlobalOption(this.globalOption);
+      await this.getAllClass();
     },
 
     clearFullData() {
@@ -388,7 +389,7 @@ export default {
       this.selectedStudentID = "";
 
       this.classList = this.classList.filter(
-        (ID) => ID === this.selectedClassID,
+        (ID) => ID === this.selectedClassID
       );
       // console.log("@@@@@@@@@@@@@@", this.classList);
 
@@ -505,7 +506,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
       );
     },
     async getFullNameStudents() {
@@ -518,12 +519,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName,
+              this.studentsList[i].FirstName
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName,
+              this.studentsList[i].LastName
             );
             change = true;
             console.log(" BREAK j", j);
@@ -684,14 +685,9 @@ export default {
     newPrintStat() {
       let auth = localStorage.getItem("user");
       let data = this.sDates.date;
-      let script =
-        "<script type='text/javascript'>function yourFunction(){console.log('112')}";
-      let scriptEnd = "/script>";
+
       let top =
         "<head>" +
-        script +
-        "<" +
-        scriptEnd +
         "</head><body onload='window.print()'><h2> МБОУ СОШ №24</h2> <h3>Отсутствующие на " +
         data +
         "</h3>";
@@ -701,20 +697,18 @@ export default {
       let style =
         "<style type='text/css'>table {border: 1px solid black; border-collapse: collapse;}  th,td { padding: 2px;border: 1px solid black; } </style> ";
 
-      let sc =
-        "<script  type='text/javascript'>window.addEventListener('DOMContentLoaded', (event) => {console.log('DOM fully loaded and parsed');});";
       let ulstat3 = document.getElementById("ul-stat3").innerHTML;
 
       printHtml2 += ulstat3;
       printHtml2 += printHtml;
       top += printHtml2;
       top += style;
-      top += sc;
+
       console.log(top);
       let tab = window.open(
         "",
         "",
-        "left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0",
+        "left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0"
       );
       tab.document.write(top);
       tab.document.close();
@@ -806,7 +800,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1,
+              this.classListAll[j].count + 1
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -817,12 +811,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i],
+                  arrayCat[i]
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1,
+                  this.sCategory[i].count + 1
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -839,7 +833,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count,
+          this.sCategory[i].count
         );
       }
 
