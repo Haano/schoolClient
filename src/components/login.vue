@@ -71,23 +71,19 @@ export default {
   },
   watch: {
     password: function () {
-      if (
-        this.selectedClassID.className != "АДМИНИСТРАТОР" &&
-        this.password === "1"
-      ) {
-        console.log("OK");
-        localStorage.setItem("user", 1);
+      let data = {
+        _id: this.selectedClassID.classID,
+        className: this.selectedClassID.className,
+        password: this.password,
+      };
 
-        this.$router.push("/dashboard");
-      }
-      if (
-        this.selectedClassID.className === "АДМИНИСТРАТОР" &&
-        this.password === "01091867"
-      ) {
-        console.log("вход под администратором");
-        localStorage.setItem("user", 2);
-        this.$router.push("/dashboard");
-      }
+      ServerCommandLogin.userLogin(data).then((res) => {
+        console.log(res, "ОТДАЧА ОТ СЕРВЕРА");
+        if (res.data.auth) {
+          localStorage.setItem("user", res.data.accessRights);
+          this.$router.push("/dashboard");
+        }
+      });
     },
   },
 };
