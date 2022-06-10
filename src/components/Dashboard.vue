@@ -188,10 +188,7 @@
                 <!-- <div v-if="item.date === this.sDates">
                 {{ item }}
               </div> -->
-                <v-card-actions
-                  id="update"
-                  v-show="marks.length > 0 || checkSendData"
-                >
+                <v-card-actions id="update" v-show="checkSendData">
                   <button
                     v-bind:id="item._id + 'update'"
                     @click="updateThisMark(item)"
@@ -572,7 +569,7 @@ export default {
       var datas = {
         causes: data.mark,
       };
-
+      console.log(data, "DADADADAD", markID);
       TutorialDataService.updateMark(markID, datas)
         .then((response) => {
           console.log("УСПЕШНО ОТПРАВЛЕНО", response);
@@ -632,15 +629,17 @@ export default {
       }
       for (i = 0; i < this.marks.length; i++) {
         console.log(i, this.marks, this.marks[i]._id);
-        console.log(document.getElementById(this.marks[i]._id));
-
-        document.getElementById(
-          this.marks[i].studentID + "update"
-        ).disabled = false;
+        console.log(
+          document.getElementById(this.marks[i].studentID + "update")
+        );
+        if (document.getElementById(this.marks[i].studentID + "update"))
+          document.getElementById(
+            this.marks[i].studentID + "update"
+          ).disabled = false;
       }
       document.getElementById("loadLast").disabled = true;
 
-      // this.show(this.selectedClassID);
+      this.show(this.selectedClassID);
     },
 
     show(data) {

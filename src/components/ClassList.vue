@@ -24,6 +24,17 @@
             name="classLider"
           />
         </div>
+        <div class="form-group">
+          <label for="classLider">Пароль</label>
+          <input
+            type="text"
+            class="form-control"
+            id="classLider"
+            required
+            v-model="sclass.password"
+            name="classLider"
+          />
+        </div>
         <br />
       </div>
       <div>
@@ -49,7 +60,29 @@
 
           <v-data-table :headers="headers" :items="sclass" :items-per-page="5">
             <template v-slot:[`item.actions`]="{ item }">
-              <v-icon small @click="deleteClass(item.id)">mdi-delete</v-icon>
+              <div class="select-flex">
+                <div class="select" style="padding-right: 20px">
+                  <input
+                    type="text"
+                    class="form-control"
+                    required
+                    v-model="item.passwordChange"
+                    name="classLider"
+                    v-bind:id="item.id"
+                  />
+                </div>
+                <div class="select">
+                  <button class="btn btn-success" @click="updatePassword(item)">
+                    Обновить пароль
+                  </button>
+                </div>
+
+                <v-card-actions>
+                  <button class="btn btn-danger" @click="deleteClass(item.id)">
+                    Удалить
+                  </button>
+                </v-card-actions>
+              </div>
             </template>
           </v-data-table>
         </v-card>
@@ -62,6 +95,7 @@
 </style>
 <script>
 import TutorialDataService from "../services/TutorialDataService";
+import ServerCommandLogin from "../services/ServerCommandLogin";
 //import { default as AddClass } from "./AddClass.vue";
 
 export default {
@@ -82,6 +116,23 @@ export default {
     };
   },
   methods: {
+    updatePassword(data) {
+      console.log(data);
+      let sendData = {
+        id: data.id,
+        passwordChange: data.passwordChange,
+        className: data.className,
+      };
+      console.log(sendData);
+
+      ServerCommandLogin.updatePassword(data.id, sendData)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     create() {
       console.log("this.Sclass.className", this.sclass.className);
       console.log("this.Sclass.classLider", this.sclass.classLider);
@@ -90,6 +141,7 @@ export default {
         className: this.sclass.className,
         classLider: this.sclass.classLider,
         shiftSchool: this.sclass.shiftSchool,
+        password: this.sclass.password,
       };
 
       console.log("dATAAAA", this.sclass);
