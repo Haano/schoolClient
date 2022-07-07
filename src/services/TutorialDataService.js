@@ -123,6 +123,16 @@ class TutorialDataService {
       observe: "response",
     });
   }
+
+  /// CLUBS
+
+  crateClub(data) {
+    return http.post("/createCLub", data);
+  }
+
+  getClubs() {
+    return http.get("/getClubs");
+  }
 }
 
 export default new TutorialDataService();
