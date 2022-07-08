@@ -18,6 +18,7 @@
             <v-btn to="/Statistic" text> Статистика </v-btn>
             <v-btn to="/Receipt" text> Квитанции </v-btn>
             <v-btn to="/Clubs" text> Доп. образование </v-btn>
+            <v-btn to="/test" text> TEST </v-btn>
 
             <!-- <v-btn to="/CreateDate" text> Даты </v-btn> -->
             <!-- v-if="selectedClass.classID === 'admin'" -->

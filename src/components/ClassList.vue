@@ -128,6 +128,7 @@ export default {
       ServerCommandLogin.updatePassword(data.id, sendData)
         .then((response) => {
           console.log(response.data);
+          alert("Пароль успешно изменен");
         })
         .catch((e) => {
           console.log(e);
