@@ -165,7 +165,7 @@
           <v-data-table
             :headers="headers"
             :items="this.sClassInput"
-            :items-per-page="50"
+            :items-per-page="60"
             hide-default-footer
           >
             <template v-slot:[`item.index`]="{ index }">
@@ -401,7 +401,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         }
 
@@ -453,7 +453,7 @@ export default {
         console.log(this.categoryCount, "categoryCOUNT");
 
         document.getElementById(
-          this.sClassInput[i]._id + "update"
+          this.sClassInput[i]._id + "update",
         ).disabled = false;
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
@@ -478,7 +478,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1
+            this.causesDefault[1].count + 1,
           );
         } else {
           this.sClassInput[i].count = false;
@@ -496,16 +496,18 @@ export default {
         // document.getElementById("sendData").disabled = true;
         // this.checkSendData = true;
         for (i = 0; i < this.marks.length; i++) {
+          console.log(this.marks.length, this.marks);
           if (
             this.marks[i].change &&
-            toDay === this.marks[i].date.slice(0, 10)
+            toDay === this.marks[i].date.slice(0, 10) &&
+            this.marks.length > 0
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update"
+              this.marks[i].studentID + "update",
             ).disabled = false;
           } else {
             document.getElementById(
-              this.marks[i].studentID + "update"
+              this.marks[i].studentID + "update",
             ).disabled = true;
             // document
             //   .getElementById(this.marks[i].studentID + "update")
@@ -683,6 +685,9 @@ export default {
             this.selectedClassID = this.selectedClass;
             this.progress = 80;
             await this.show(this.selectedClassID);
+          } else {
+            this.progress = 100;
+            await this.show(this.selectedClassID);
           }
         })
         .catch((e) => {
@@ -744,7 +749,7 @@ export default {
       xhr.open(
         "GET",
         "http://worldtimeapi.org/api/timezone/Europe/London",
-        false
+        false,
       ); // Делаем запрос по Лондону
       xhr.send(); // отправляем
       if (xhr.status != 200) {
@@ -769,7 +774,7 @@ export default {
       this.$set(
         this.sDates,
         "date",
-        new Date(this.DateInternet).toISOString().slice(0, 10)
+        new Date(this.DateInternet).toISOString().slice(0, 10),
       );
       // добавить колонку с датой и выбором
       this.$set(this.headers, 4, {

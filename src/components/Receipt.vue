@@ -96,6 +96,14 @@
           <b> Сумма квитанции:</b> {{ amount }} <br />
           <b> Период:</b> {{ period }} <br />
           <b> Файл:</b> {{ file.name }} <br />
+          <b> Размер:</b> {{ (file.size / 1024 / 1024).toFixed(2) }} Мб
+          <div
+            style="color: red"
+            v-if="(file.size / 1024 / 1024).toFixed(2) > 5"
+          >
+            РАЗМЕР ФАЙЛА БОЛЬШЕ 5 Мб!
+          </div>
+          <br />
         </div>
         <div
           v-if="
@@ -104,7 +112,8 @@
             selectedStudentID != 'Все' &&
             selectedStudentID != '' &&
             period != '' &&
-            file != ''
+            file != '' &&
+            (file.size / 1024 / 1024).toFixed(2) < 5
           "
           class="flex-food"
         >
@@ -730,13 +739,14 @@ export default {
 
     async sendFileToServer() {
       let data = new FormData();
+      console.log(this.file);
       data.append("file", this.file, this.file.name); // очень важный data.append ("файл", файл); неудачно
       data.append("studentID", this.selectedStudentID._id);
       data.append("date", this.date);
       data.append("id", this.identifier);
       data.append("classID", this.selectedClassID.classID);
       data.append("className", this.selectedClassID.className);
-
+      console.log(data);
       TutorialDataService.sendFile(data)
         .then(
           (res) =>

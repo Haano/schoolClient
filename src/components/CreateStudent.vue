@@ -1,6 +1,6 @@
 <template>
   <div class="cat-student">
-    <div class="class-student">
+    <div>
       <div>
         Класс
         <select
@@ -23,7 +23,7 @@
         >
       </div>
 
-      <div class="submit-form mt-3 mx-auto">
+      <div>
         <div class="submit-form">
           <div class="form-group">
             <label for="className">Фамилия</label>

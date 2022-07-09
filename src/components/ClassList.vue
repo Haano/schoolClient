@@ -50,7 +50,30 @@
         </select>
       </div>
       <br />
-      <button @click="create" class="btn btn-success">Создать класс</button>
+      <div style="display: flex; justify-content: center; padding: 0 0 10px 0">
+        <button
+          @click="create"
+          class="btn btn-success"
+          style="width: 500px; padding: 20px"
+        >
+          Создать класс
+        </button>
+      </div>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          padding: 0 0 10px 0;
+        "
+      >
+        <button
+          @click="importStudents()"
+          class="btn btn-dark"
+          style="width: 500px"
+        >
+          Импорт учеников
+        </button>
+      </div>
     </div>
     <br />
     <div>
@@ -58,7 +81,12 @@
         <v-card>
           <v-card-title>Список классов</v-card-title>
 
-          <v-data-table :headers="headers" :items="sclass" :items-per-page="5">
+          <v-data-table
+            :headers="headers"
+            :items="sclass"
+            :items-per-page="100"
+            hide-default-footer
+          >
             <template v-slot:[`item.actions`]="{ item }">
               <div class="select-flex">
                 <div class="select" style="padding-right: 20px">
@@ -88,18 +116,21 @@
         </v-card>
       </v-col>
     </div>
+
+    <modal v-show="showModalCheck" @close="importStudents()" />
   </v-row>
 </template>
 <style>
 @import "../assets/style.css";
 </style>
 <script>
+import modal from "./importStudents.vue";
 import TutorialDataService from "../services/TutorialDataService";
 import ServerCommandLogin from "../services/ServerCommandLogin";
 //import { default as AddClass } from "./AddClass.vue";
 
 export default {
-  // components: { AddClass },
+  components: { modal },
 
   name: "tutorials-list",
   data() {
@@ -113,9 +144,13 @@ export default {
         { text: "Смена", value: "shiftSchool", sortable: false },
         { text: "Actions", value: "actions", sortable: false },
       ],
+      showModalCheck: false,
     };
   },
   methods: {
+    importStudents() {
+      this.showModalCheck = !this.showModalCheck;
+    },
     updatePassword(data) {
       console.log(data);
       let sendData = {

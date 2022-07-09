@@ -252,7 +252,6 @@
                   :headers="headersEat"
                   :items="this.classListAll"
                   :items-per-page="3000"
-                  hide-default-footer
                   id="table"
                 >
                 </v-data-table>
@@ -398,7 +397,7 @@ export default {
       this.selectedStudentID = "";
 
       this.classList = this.classList.filter(
-        (ID) => ID === this.selectedClassID
+        (ID) => ID === this.selectedClassID,
       );
       // console.log("@@@@@@@@@@@@@@", this.classList);
 
@@ -515,7 +514,7 @@ export default {
       console.log("this.marks", this.marks);
       console.log("this.countAll", this.countAll);
       alert(
-        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)"
+        "Красная - еще не подали \nСиняя - подали, но изменили в течении дня \nЗеленые - подали без изменения \nПроценты считаются от количества учеников, на которых подали данные (Данные отправлены на: Х)",
       );
     },
     async getFullNameStudents() {
@@ -528,12 +527,12 @@ export default {
             this.$set(
               this.marksPrint[j],
               "FirstName",
-              this.studentsList[i].FirstName
+              this.studentsList[i].FirstName,
             );
             this.$set(
               this.marksPrint[j],
               "LastName",
-              this.studentsList[i].LastName
+              this.studentsList[i].LastName,
             );
             change = true;
             console.log(" BREAK j", j);
@@ -720,7 +719,7 @@ export default {
       let tab = window.open(
         "",
         "",
-        "left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0"
+        "left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0",
       );
       tab.document.write(top);
       tab.document.close();
@@ -812,7 +811,7 @@ export default {
             this.$set(
               this.classListAll[j],
               "count",
-              this.classListAll[j].count + 1
+              this.classListAll[j].count + 1,
             );
 
             // let countCat = this.sCategory[i].sCategory;
@@ -823,12 +822,12 @@ export default {
                 this.$set(
                   this.classListAll[j],
                   this.sCategory[i].id,
-                  arrayCat[i]
+                  arrayCat[i],
                 );
                 this.$set(
                   this.sCategory[i],
                   "count",
-                  this.sCategory[i].count + 1
+                  this.sCategory[i].count + 1,
                 );
                 console.log("СЛОЖИЛ", this.sCategory[i]);
               }
@@ -845,7 +844,7 @@ export default {
         this.$set(
           this.classListAll[this.classListAll.length - 1],
           this.sCategory[i].id,
-          this.sCategory[i].count
+          this.sCategory[i].count,
         );
       }
 
