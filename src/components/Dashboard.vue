@@ -401,7 +401,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         }
 
@@ -453,7 +453,7 @@ export default {
         console.log(this.categoryCount, "categoryCOUNT");
 
         document.getElementById(
-          this.sClassInput[i]._id + "update",
+          this.sClassInput[i]._id + "update"
         ).disabled = false;
         for (var j = 0; j < this.marks.length; j++) {
           if (this.sClassInput[i]._id === this.marks[j].studentID) {
@@ -478,7 +478,7 @@ export default {
           this.$set(
             this.causesDefault[1],
             "count",
-            this.causesDefault[1].count + 1,
+            this.causesDefault[1].count + 1
           );
         } else {
           this.sClassInput[i].count = false;
@@ -496,18 +496,17 @@ export default {
         // document.getElementById("sendData").disabled = true;
         // this.checkSendData = true;
         for (i = 0; i < this.marks.length; i++) {
-          console.log(this.marks.length, this.marks);
           if (
             this.marks[i].change &&
             toDay === this.marks[i].date.slice(0, 10) &&
             this.marks.length > 0
           ) {
             document.getElementById(
-              this.marks[i].studentID + "update",
+              this.marks[i].studentID + "update"
             ).disabled = false;
           } else {
             document.getElementById(
-              this.marks[i].studentID + "update",
+              this.marks[i].studentID + "update"
             ).disabled = true;
             // document
             //   .getElementById(this.marks[i].studentID + "update")
@@ -606,25 +605,47 @@ export default {
       return temp1;
     },
 
-    updateThisMark(data) {
+    async updateThisMark(data) {
       var markID;
-
+      console.log(data, this.marks.length);
       for (var j = 0; j < this.marks.length; j++) {
         if (this.marks[j].studentID === data._id) {
           markID = this.marks[j]._id;
+          console.log(data, "НАШЕЛ");
+          break;
+        } else {
+          console.log("Не нашел");
         }
       }
-      var datas = {
-        causes: data.mark,
-      };
-      console.log(data, "DADADADAD", markID);
-      TutorialDataService.updateMark(markID, datas)
-        .then((response) => {
-          console.log("УСПЕШНО ОТПРАВЛЕНО", response);
-        })
-        .catch((e) => {
-          console.log("1111111111", e);
-        });
+      if (markID === undefined) {
+        let datas = [];
+        datas[0] = {
+          date: this.sDates.date,
+          classID: data.classID,
+          studentID: data._id,
+          causesID: data.mark,
+          cat: data.Category,
+        };
+        await TutorialDataService.createMarks(datas)
+          .then(async (response) => {
+            console.log("Создано", response);
+          })
+          .catch((e) => {
+            console.log("1111111111", e);
+          });
+      } else {
+        var datas = {
+          causes: data.mark,
+        };
+        console.log(data, "DADADADAD", markID);
+        TutorialDataService.updateMark(markID, datas)
+          .then((response) => {
+            console.log("УСПЕШНО ОТПРАВЛЕНО", response);
+          })
+          .catch((e) => {
+            console.log("1111111111", e);
+          });
+      }
 
       document.getElementById(data._id + "update").disabled = true;
 
@@ -749,7 +770,7 @@ export default {
       xhr.open(
         "GET",
         "http://worldtimeapi.org/api/timezone/Europe/London",
-        false,
+        false
       ); // Делаем запрос по Лондону
       xhr.send(); // отправляем
       if (xhr.status != 200) {
@@ -774,7 +795,7 @@ export default {
       this.$set(
         this.sDates,
         "date",
-        new Date(this.DateInternet).toISOString().slice(0, 10),
+        new Date(this.DateInternet).toISOString().slice(0, 10)
       );
       // добавить колонку с датой и выбором
       this.$set(this.headers, 4, {

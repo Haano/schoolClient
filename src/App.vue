@@ -62,6 +62,14 @@
       <transition name="component-fade" mode="out-in" appear>
         <router-view @example="methodName" :selectedClass="selectedClass" />
       </transition>
+      <transition name="fade">
+        <div v-if="buttonShow" @click="click" class="button">
+          <div class="arrow-1">
+            <div></div>
+          </div>
+          <div style="margin: 45px -10px 0 25px">Вверх!</div>
+        </div>
+      </transition>
     </v-main>
   </v-app>
 </template>
@@ -71,6 +79,7 @@ export default {
   name: "app",
   data: function () {
     return {
+      buttonShow: false,
       router: this.$router.currentRoute.name,
       localStorage: localStorage,
       check: false,
@@ -93,6 +102,16 @@ export default {
     del() {
       localStorage.clear();
     },
+
+    checkScrollPosition() {
+      this.buttonShow = window.pageYOffset > 750;
+    },
+    click() {
+      scroll({
+        top: 0,
+        behavior: "smooth",
+      });
+    },
   },
   mounted() {
     console.log(this.selectedClass.className, "this.selectedClass");
@@ -100,6 +119,9 @@ export default {
       localStorage.clear();
       this.$router.push("/login");
     }
+
+    this.checkScrollPosition();
+    window.addEventListener("scroll", this.checkScrollPosition);
   },
   watch: {
     "$route.query": {
@@ -140,5 +162,85 @@ export default {
 /* .component-fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
   transform: translateY(100px);
+}
+
+.content {
+  height: 1000px;
+  background-color: #ffdddd;
+}
+
+.button {
+  color: rgb(0, 0, 0);
+
+  position: fixed;
+  left: 20px;
+  bottom: 25px;
+  cursor: pointer;
+  padding: 10px 30px 10px 0px;
+  margin: 0 0 10px 0;
+  background-color: #b4ffcd48;
+  border-radius: 30px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 1000;
+}
+
+.arrow-1 {
+  transform: rotate(-90deg);
+  cursor: pointer;
+  position: relative;
+
+  margin: 20px 0 20px -10px;
+}
+.arrow-1 div {
+  position: relative;
+  top: 20px;
+  width: 50px;
+  height: 10px;
+  background-color: #33b733;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+
+  display: block;
+}
+.arrow-1 div::after {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 10px;
+  top: -11px;
+  right: -8px;
+  background-color: #33b733;
+  transform: rotate(45deg);
+}
+.arrow-1 div::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 10px;
+  top: 11px;
+  right: -8px;
+  background-color: #33b733;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  transform: rotate(-45deg);
+}
+.button:hover {
+  animation: arrow-1 1s linear infinite;
+}
+@keyframes arrow-1 {
+  0% {
+    bottom: 20px;
+  }
+  50% {
+    bottom: 25px;
+  }
+  100% {
+    bottom: 20px;
+  }
 }
 </style>
