@@ -62,7 +62,13 @@ class TutorialDataService {
         return http.post("/createClass", data);
     }
     getAllCLass() {
-        return http.get("/getAllClass");
+        return http.get(
+            "/getAllClass", {}, {
+                headers: {
+                    "ngrok-skip-browser-warning": 1,
+                },
+            },
+        );
     }
 
     getAllCauses() {

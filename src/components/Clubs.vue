@@ -1,5 +1,6 @@
 <template>
   <div class="cat">
+    
     <div class="cat">
       <div class="cat-item">
         <label for="className">Название</label>
