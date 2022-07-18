@@ -26,6 +26,7 @@
 </template>
 
 <script>
+// import { Server } from "http";
 import ServerCommandLogin from "../services/ServerCommandLogin";
 
 export default {
@@ -50,12 +51,17 @@ export default {
         };
         this.classList = res.data.map(this.getDisplayClass);
         this.classList.push(admin);
-        console.log(res, this.classList);
+        console.log(res, this.classList, "kek");
       });
     },
     changeClass(data) {
       console.log(data);
       this.$emit("example", this.selectedClassID);
+      this.password = "";
+
+      ServerCommandLogin.auth(data).then((res) => {
+        console.log(res);
+      });
     },
 
     getDisplayClass(data) {
@@ -68,6 +74,7 @@ export default {
   mounted() {
     this.del();
     this.getClassList();
+    this.password = "";
   },
   watch: {
     password: function () {
@@ -81,6 +88,7 @@ export default {
         console.log(res, "ОТДАЧА ОТ СЕРВЕРА");
         if (res.data.auth) {
           localStorage.setItem("user", res.data.accessRights);
+
           this.$router.push("/dashboard");
         }
       });

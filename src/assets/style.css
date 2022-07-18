@@ -209,19 +209,21 @@ TH {
 .component-fade-leave-to
 /* .component-fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
-  transform: translateY(100px);
+  transform: translateY(10px);
 }
 
 .list-enter-active,
 .list-leave-active {
-  transform: translateY(10px);
-  animation: bounce-in 0.7s;
+  /* transform: translateY(1px);
+  animation: bounce-in 0.1s; */
+  opacity: 0;
 }
 
 .list-enter,
 .list-leave-to
 /* .list-leave-active до версии 2.1.8 */ {
-  animation: bounce-in 0.7s reverse;
+  /* animation: bounce-in 0.1s reverse; */
+  opacity: 0;
 }
 
 .class-mark-noBoard {
@@ -241,7 +243,7 @@ TH {
     transform: scale(0);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.01);
   }
   100% {
     transform: scale(1);

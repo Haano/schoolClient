@@ -60,7 +60,18 @@
     <v-main>
       <!-- <button @click="checked()">CHECK</button> -->
       <transition name="component-fade" mode="out-in" appear>
-        <router-view @example="methodName" :selectedClass="selectedClass" />
+        <router-view
+          v-if="!$route.meta.keepAlive"
+          @example="methodName"
+          :selectedClass="selectedClass"
+        ></router-view>
+        <keep-alive>
+          <router-view
+            v-if="$route.meta.keepAlive"
+            @example="methodName"
+            :selectedClass="selectedClass"
+          ></router-view>
+        </keep-alive>
       </transition>
       <transition name="fade">
         <div v-if="buttonShow" @click="click" class="button">

@@ -219,12 +219,11 @@
 .component-fade-leave-active {
   //transition: opacity 0.3s ease;
 
-  transition: all 0.2s ease-out;
+  transition: all 0.1s ease-out;
 }
 .component-fade-enter, .component-fade-leave-to
 /* .component-fade-leave-active до версии 2.1.8 */ {
   opacity: 0;
-  transform: translateY(100px);
 }
 
 .dashboard-main {
@@ -944,7 +943,7 @@ export default {
 .v-data-table > .v-data-table > table > tbody > tr > td,
 .v-data-table > .v-data-table > table > thead > tr > td,
 .v-data-table > .v-data-table > table > tfoot > tr > td {
-  height: 10px;
+  height: 9px;
 }
 .form-select {
   height: 40px;

@@ -11,6 +11,9 @@ class ServerCommandLogin {
   updatePassword(id, data) {
     return http.put(`/updatePassword/${id}`, data);
   }
+  auth(data) {
+    return http.post(`/auth`, data);
+  }
 }
 
 export default new ServerCommandLogin();
