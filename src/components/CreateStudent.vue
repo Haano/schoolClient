@@ -213,15 +213,18 @@ export default {
     },
 
     deleteStudent(id) {
-      TutorialDataService.deleteStudent(id)
-        .then(() => {
-          this.initialization();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      let result = confirm("Вы действительно хотите удалить ученика " + id);
+      if (result) {
+        TutorialDataService.deleteStudent(id)
+          .then(() => {
+            this.initialization();
+          })
+          .catch((e) => {
+            console.log(e);
+          });
 
-      this.initialization();
+        this.initialization();
+      }
     },
 
     async updateCat(ID) {

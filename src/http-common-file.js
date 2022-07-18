@@ -3,7 +3,8 @@ import axios from "axios";
 export default axios.create({
     //<<<<<<< HEAD
     //baseURL: "http://192.168.0.112:8081/tutorials",
-    baseURL: "https://0bb4-178-170-253-71.eu.ngrok.io/tutorials",
+    //baseURL: "https://a931-37-18-41-143.eu.ngrok.io/tutorials",
+    baseURL: "http://localhost:8081/tutorials",
     headers: {
         "Content-type": "multipart/form-data",
         "ngrok-skip-browser-warning": 1,
