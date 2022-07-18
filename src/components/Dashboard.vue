@@ -496,7 +496,6 @@ export default {
         // document.getElementById("sendData").disabled = true;
         // this.checkSendData = true;
         for (i = 0; i < this.marks.length; i++) {
-          console.log(this.marks.length, this.marks);
           if (
             this.marks[i].change &&
             toDay === this.marks[i].date.slice(0, 10) &&
@@ -606,25 +605,47 @@ export default {
       return temp1;
     },
 
-    updateThisMark(data) {
+    async updateThisMark(data) {
       var markID;
-
+      console.log(data, this.marks.length);
       for (var j = 0; j < this.marks.length; j++) {
         if (this.marks[j].studentID === data._id) {
           markID = this.marks[j]._id;
+          console.log(data, "НАШЕЛ");
+          break;
+        } else {
+          console.log("Не нашел");
         }
       }
-      var datas = {
-        causes: data.mark,
-      };
-      console.log(data, "DADADADAD", markID);
-      TutorialDataService.updateMark(markID, datas)
-        .then((response) => {
-          console.log("УСПЕШНО ОТПРАВЛЕНО", response);
-        })
-        .catch((e) => {
-          console.log("1111111111", e);
-        });
+      if (markID === undefined) {
+        let datas = [];
+        datas[0] = {
+          date: this.sDates.date,
+          classID: data.classID,
+          studentID: data._id,
+          causesID: data.mark,
+          cat: data.Category,
+        };
+        await TutorialDataService.createMarks(datas)
+          .then(async (response) => {
+            console.log("Создано", response);
+          })
+          .catch((e) => {
+            console.log("1111111111", e);
+          });
+      } else {
+        var datas = {
+          causes: data.mark,
+        };
+        console.log(data, "DADADADAD", markID);
+        TutorialDataService.updateMark(markID, datas)
+          .then((response) => {
+            console.log("УСПЕШНО ОТПРАВЛЕНО", response);
+          })
+          .catch((e) => {
+            console.log("1111111111", e);
+          });
+      }
 
       document.getElementById(data._id + "update").disabled = true;
 
@@ -744,6 +765,7 @@ export default {
     },
 
     getDate() {
+      // <<<<<<< HEAD
       // let plus = 3; // Сколько времени прибавляем (+3 это время по Москве)
       // var xhr = new XMLHttpRequest();
       // xhr.open(
@@ -766,6 +788,28 @@ export default {
       // }
       let resultTimeout = new Date();
       return resultTimeout;
+      // =======
+      //       let plus = 3; // Сколько времени прибавляем (+3 это время по Москве)
+      //       var xhr = new XMLHttpRequest();
+      //       xhr.open(
+      //         "GET",
+      //         "http://worldtimeapi.org/api/timezone/Europe/London",
+      //         false
+      //       ); // Делаем запрос по Лондону
+      //       xhr.send(); // отправляем
+      //       if (xhr.status != 200) {
+      //         console.log(xhr.status + ": " + xhr.statusText); // Если статус не равен 200, то выводим ошибку.
+      //       } else {
+      //         let time = xhr.responseText; // получаем текст ответа
+      //         let z = JSON.parse(time).utc_datetime; // Получаем время utc
+      //         let time1 = new Date(z).getTime(); // Переводим в timestamp
+      //         let timestampPlus = time1 + plus * 60 * 60 * 1000; // Воемя +3 часа. Если надо получить время UTC, то убираем просто параметр plus
+      //         let timePlus = new Date(timestampPlus); // Переводим во время (Тут надо понимать, что система сама переведёт его в текущую временную зону
+      //         let result = timePlus.toUTCString(); // Переводим в строку UTC;
+      //         console.log(result, "!!!!!!!!!!!!!!!"); // Выводим дату.
+      //         return result;
+      //       }
+      // >>>>>>> 1112d9beb64cef69d460f55ef570429a6b7898a7
     },
 
     async retrieveClass() {
