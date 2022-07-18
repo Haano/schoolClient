@@ -49,6 +49,7 @@ export default {
           className: "АДМИНИСТРАТОР",
           classID: "admin",
         };
+        console.log(res.data);
         this.classList = res.data.map(this.getDisplayClass);
         this.classList.push(admin);
         console.log(res, this.classList, "kek");

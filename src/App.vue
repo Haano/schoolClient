@@ -1,5 +1,9 @@
 <template>
   <v-app>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
     <div>
       <transition name="component-fade" mode="out-in">
         <div v-if="check">
